@@ -1,5 +1,6 @@
 ﻿@{
     var hideTitleBar = ViewData["HideTitleBar"] as bool? ?? false;
+    var isLoggedIn = Context.Session.GetString("UserEmail") != null; // Check if user is logged in
 }
 
 <!DOCTYPE html>
@@ -34,6 +35,14 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                             </li>
                         </ul>
+
+                        <!-- 🔹 Show Logout Button If User Is Logged In -->
+                        @if (isLoggedIn)
+                        {
+                            <form method="post" asp-controller="User" asp-action="Logout">
+                                <button type="submit" class="btn btn-danger">Logout</button>
+                            </form>
+                        }
                     </div>
                 </div>
             </nav>

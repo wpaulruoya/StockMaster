@@ -66,5 +66,12 @@ namespace StockMaster.Controllers
             ViewBag.Error = "Invalid email or password.";
             return View("Login");
         }
+        [HttpPost]
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear(); // Clear session data
+            return RedirectToAction("Index", "Home"); // Redirect to landing page
+        }
+
     }
 }
