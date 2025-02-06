@@ -8,11 +8,15 @@ namespace StockMaster.Models
         public int Id { get; set; }
 
         [Required]
-        public required string ItemName { get; set; } // Use 'required' modifier (C# 11+)
+        public string Name { get; set; }
 
         [Required]
         public int Quantity { get; set; }
 
-        public DateTime DateAdded { get; set; } = DateTime.Now;
+        [Required]
+        public decimal Price { get; set; }
+
+        public string UserId { get; set; } // Tie inventory to a specific user
     }
+
 }

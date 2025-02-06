@@ -1,0 +1,22 @@
+﻿@{
+    ViewData["Title"] = "Add Item";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4">Add New Item</h2>
+    <form method="post" action="@Url.Action("Add", "Inventory")">
+        <div class="form-group">
+            <label>Item Name</label>
+            <input type="text" class="form-control" name="itemName" required />
+        </div>
+        <div class="form-group">
+            <label>Quantity</label>
+            <input type="number" class="form-control" name="quantity" required />
+        </div>
+        <div class="form-group">
+            <label>Price</label>
+            <input type="number" class="form-control" name="price" step="0.01" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Save Item</button>
+    </form>
+</div>

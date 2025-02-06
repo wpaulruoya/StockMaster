@@ -1,0 +1,22 @@
+﻿@{
+    ViewData["Title"] = "Inventory";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4">My Inventory</h2>
+    <a class="btn btn-success mb-3" href="@Url.Action("Add", "Inventory")">Add New Item</a>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Item Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Inventory items will be dynamically populated here -->
+        </tbody>
+    </table>
+</div>
