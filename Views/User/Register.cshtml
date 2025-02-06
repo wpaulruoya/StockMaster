@@ -5,26 +5,59 @@
 <div class="container-box">
     <h1>Register for StockMaster</h1>
 
-    @if (TempData["SuccessMessage"] != null)
+    @if (!string.IsNullOrEmpty(ViewBag.SuccessMessage))
     {
-        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+        <div class="alert alert-success">@ViewBag.SuccessMessage</div>
     }
 
-    <form method="post" action="@Url.Action("Register", "User")">
+    <form method="post" action="@Url.Action("Register", "User")" onsubmit="return validatePassword()">
         <div class="form-group">
-            <input type="text" name="fullName" class="form-control" placeholder="Full Name" required />
+            <input type="text" class="form-control" name="fullName" placeholder="Full Name" required />
         </div>
         <div class="form-group">
-            <input type="email" name="email" class="form-control" placeholder="Email" required />
+            <input type="email" class="form-control" name="email" placeholder="Email" required />
         </div>
         <div class="form-group">
-            <input type="password" name="password" class="form-control" placeholder="Password" required />
+            <input type="password" class="form-control" id="password" name="password" placeholder="Password" required />
+        </div>
+        <div class="form-group">
+            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required />
         </div>
         <button type="submit" class="btn btn-register">Register</button>
     </form>
 
+    <div class="password-guidelines">
+        <p><strong>Password Requirements:</strong></p>
+        <ul>
+            <li>At least 8 characters long</li>
+            <li>Contains at least one uppercase letter</li>
+            <li>Contains at least one number</li>
+            <li>Contains at least one special character (e.g.#, $, %)</li>
+        </ul>
+    </div>
+
     <a href="@Url.Action("Login", "User")" class="link">Already have an account? Login here</a>
 </div>
+
+<script>
+    function validatePassword() {
+        var password = document.getElementById("password").value;
+        var confirmPassword = document.getElementById("confirmPassword").value;
+
+        // ✅ Now includes  as a valid special character
+    var passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@@#$%^&+=!]).{8,}$/;
+
+        if (!passwordRegex.test(password)) {
+            alert("Password does not meet requirements.");
+            return false;
+        }
+        if (password !== confirmPassword) {
+            alert("Passwords do not match!");
+            return false;
+        }
+        return true;
+    }
+</script>
 
 <style>
     body {
@@ -66,9 +99,19 @@
         width: 100%;
     }
 
-        .btn-register:hover {
-            background: #d35400;
-        }
+    .btn-register:hover {
+        background: #d35400;
+    }
+
+    .password-guidelines {
+        text-align: left;
+        font-size: 14px;
+        margin-top: 10px;
+    }
+
+    .password-guidelines ul {
+        padding-left: 15px;
+    }
 
     .link {
         display: block;
@@ -78,7 +121,7 @@
         text-decoration: none;
     }
 
-        .link:hover {
-            text-decoration: underline;
-        }
+    .link:hover {
+        text-decoration: underline;
+    }
 </style>

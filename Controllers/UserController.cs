@@ -27,27 +27,40 @@ namespace StockMaster.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(string fullName, string email, string password)
+        [HttpPost]
+        public async Task<IActionResult> Register(string fullName, string email, string password, string confirmPassword)
         {
-            if (ModelState.IsValid)
+            if (password != confirmPassword)
             {
-                var user = new IdentityUser { UserName = email, Email = email };
-
-                var result = await _userManager.CreateAsync(user, password);
-                if (result.Succeeded)
-                {
-                    TempData["SuccessMessage"] = "Registration successful! You can now log in.";
-                    return RedirectToAction("Login");
-                }
-
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
+                ViewBag.ErrorMessage = "Passwords do not match.";
+                return View();
             }
 
-            return View();
+            // Ensure the password meets security requirements
+            var passwordValidator = new PasswordValidator<IdentityUser>();
+            var passwordCheck = await passwordValidator.ValidateAsync(_userManager, null, password);
+
+            if (!passwordCheck.Succeeded)
+            {
+                ViewBag.ErrorMessage = "Password does not meet security requirements.";
+                return View();
+            }
+
+            var user = new IdentityUser { UserName = email, Email = email };
+            var result = await _userManager.CreateAsync(user, password);
+
+            if (result.Succeeded)
+            {
+                ViewBag.SuccessMessage = "Registration successful! Redirecting to login...";
+                return RedirectToAction("Login");
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "Registration failed. Please try again.";
+                return View();
+            }
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Authenticate(string email, string password)
