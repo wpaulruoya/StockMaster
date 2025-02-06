@@ -7,15 +7,15 @@
     <form method="post" action="@Url.Action("Add", "Inventory")">
         <div class="form-group">
             <label>Item Name</label>
-            <input type="text" class="form-control" name="itemName" required />
+            <input type="text" class="form-control" name="Name" required /> <!-- Change 'itemName' to 'Name' -->
         </div>
         <div class="form-group">
             <label>Quantity</label>
-            <input type="number" class="form-control" name="quantity" required />
+            <input type="number" class="form-control" name="Quantity" required /> <!-- Change 'quantity' to 'Quantity' -->
         </div>
         <div class="form-group">
             <label>Price</label>
-            <input type="number" class="form-control" name="price" step="0.01" required />
+            <input type="number" class="form-control" name="Price" step="0.01" required /> <!-- Change 'price' to 'Price' -->
         </div>
         <button type="submit" class="btn btn-primary">Save Item</button>
     </form>

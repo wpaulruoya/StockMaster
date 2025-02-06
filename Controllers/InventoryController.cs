@@ -26,9 +26,11 @@ namespace StockMaster.Controllers
         public IActionResult Index()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Get logged-in user ID
-            var userInventory = _context.Inventories.Where(i => i.UserId == userId).ToList();
-            return View(userInventory);
+            var userInventory = _context.Inventories.Where(i => i.UserId == userId).ToList(); // Get user's inventory items
+
+            return View(userInventory); // Pass the inventory list to the view
         }
+
 
         // GET: Inventory/Add
         public IActionResult Add()
@@ -36,19 +38,32 @@ namespace StockMaster.Controllers
             return View();
         }
 
-        // POST: Inventory/Add
         [HttpPost]
         public async Task<IActionResult> Add(Inventory model)
         {
             if (ModelState.IsValid)
             {
-                model.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Assign user ID
-                _context.Inventories.Add(model);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Index");
+                try
+                {
+                    model.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Assign user ID
+                    _context.Inventories.Add(model);
+                    await _context.SaveChangesAsync();
+
+                    // Set success message
+                    TempData["SuccessMessage"] = "Item added successfully!";
+                    return RedirectToAction("Index");
+                }
+                catch (Exception ex)
+                {
+                    // Log error and show message
+                    Console.WriteLine($"Error: {ex.Message}");
+                    TempData["ErrorMessage"] = "An error occurred while adding the item.";
+                    return RedirectToAction("Index");
+                }
             }
             return View(model);
         }
+
 
         // GET: Inventory/Edit/{id}
         public IActionResult Edit(int id)

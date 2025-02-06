@@ -1,11 +1,23 @@
-﻿@{
-    ViewData["Title"] = "Inventory";
+﻿@Model List<StockMaster.Models.Inventory>
+@{
+    ViewData["Title"] = "My Inventory";
 }
+
 
 <div class="container mt-5">
     <h2 class="mb-4">My Inventory</h2>
-    <a class="btn btn-success mb-3" href="@Url.Action("Add", "Inventory")">Add New Item</a>
 
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <!-- Display an empty table structure -->
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -16,7 +28,27 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Inventory items will be dynamically populated here -->
+            @if (Model != null && Model.Count > 0)
+            {
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.Price</td>
+                        <td>
+                            <a href="@Url.Action("Edit", "Inventory", new { id = item.Id })" class="btn btn-warning">Edit</a>
+                            <a href="@Url.Action("Delete", "Inventory", new { id = item.Id })" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4" class="text-center">No items in your inventory.</td>
+                </tr>
+            }
         </tbody>
     </table>
 </div>
