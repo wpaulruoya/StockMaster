@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using StockMaster.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +18,15 @@ builder.Services.AddDefaultIdentity<IdentityUser>()
 // 🔹 Add Controllers & Views
 builder.Services.AddControllersWithViews();
 
+// 🔹 Add Sessions
+builder.Services.AddDistributedMemoryCache(); // Required for session storage
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout
+    options.Cookie.HttpOnly = true; // Security best practice
+    options.Cookie.IsEssential = true; // Ensures the session is always maintained
+});
+
 var app = builder.Build();
 
 // 🔹 Middleware Pipeline
@@ -26,9 +37,13 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles(); // Ensure static files are served (CSS, JS, etc.)
 app.UseRouting();
-app.UseAuthentication(); // Ensure authentication is enabled
+app.UseAuthentication();
 app.UseAuthorization();
+
+// 🔹 Enable Sessions
+app.UseSession();
 
 app.MapControllerRoute(
     name: "default",
