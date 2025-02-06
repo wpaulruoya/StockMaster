@@ -1,0 +1,75 @@
+﻿@{
+    ViewData["HideTitleBar"] = true;
+}
+<div class="container-box">
+    <h1>Welcome to <br> StockMaster</h1>
+    <p>Effortless Inventory Management</p>
+
+    <a class="btn btn-login" href="@Url.Action("Login", "User")">Login</a>
+    <a class="btn btn-register" href="@Url.Action("Register", "User")">Register</a>
+</div>
+
+<style>
+    body {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        font-family: 'Arial', sans-serif;
+    }
+
+    .container-box {
+        text-align: center;
+        padding: 40px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 12px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(6px);
+        width: 400px;
+    }
+
+    h1 {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    p {
+        font-size: 16px;
+        opacity: 0.9;
+    }
+
+    .btn {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        display: block;
+        border: none;
+        transition: all 0.3s ease-in-out;
+        margin-top: 10px;
+    }
+
+    .btn-login {
+        background: #27ae60;
+        color: white;
+    }
+
+        .btn-login:hover {
+            background: #1e8449;
+        }
+
+    .btn-register {
+        background: #e67e22;
+        color: white;
+    }
+
+        .btn-register:hover {
+            background: #d35400;
+        }
+</style>
