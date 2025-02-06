@@ -1,18 +1,24 @@
 ﻿@{
     ViewData["HideTitleBar"] = true;
 }
+
 <div class="container-box">
     <h1>Register for StockMaster</h1>
 
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
     <form method="post" action="@Url.Action("Register", "User")">
         <div class="form-group">
-            <input type="text" class="form-control" placeholder="Full Name" required />
+            <input type="text" name="fullName" class="form-control" placeholder="Full Name" required />
         </div>
         <div class="form-group">
-            <input type="email" class="form-control" placeholder="Email" required />
+            <input type="email" name="email" class="form-control" placeholder="Email" required />
         </div>
         <div class="form-group">
-            <input type="password" class="form-control" placeholder="Password" required />
+            <input type="password" name="password" class="form-control" placeholder="Password" required />
         </div>
         <button type="submit" class="btn btn-register">Register</button>
     </form>
