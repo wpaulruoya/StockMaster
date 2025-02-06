@@ -37,7 +37,6 @@ namespace StockMaster.Controllers
         {
             return View();
         }
-
         [HttpPost]
         public async Task<IActionResult> Add(Inventory model)
         {
@@ -45,6 +44,9 @@ namespace StockMaster.Controllers
             {
                 try
                 {
+                    // Log the data to see if it's coming through correctly
+                    Console.WriteLine($"Adding Item: {model.Name}, Quantity: {model.Quantity}, Price: {model.Price}");
+
                     model.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Assign user ID
                     _context.Inventories.Add(model); // Add item to the context
                     await _context.SaveChangesAsync(); // Save changes to the database
@@ -63,6 +65,7 @@ namespace StockMaster.Controllers
             }
             return View(model);
         }
+
 
 
 
