@@ -46,23 +46,24 @@ namespace StockMaster.Controllers
                 try
                 {
                     model.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Assign user ID
-                    _context.Inventories.Add(model);
-                    await _context.SaveChangesAsync();
+                    _context.Inventories.Add(model); // Add item to the context
+                    await _context.SaveChangesAsync(); // Save changes to the database
 
-                    // Set success message
+                    // Set success message and redirect to Inventory Index
                     TempData["SuccessMessage"] = "Item added successfully!";
-                    return RedirectToAction("Index");
+                    return RedirectToAction("Index", "Inventory");
                 }
                 catch (Exception ex)
                 {
                     // Log error and show message
                     Console.WriteLine($"Error: {ex.Message}");
                     TempData["ErrorMessage"] = "An error occurred while adding the item.";
-                    return RedirectToAction("Index");
+                    return RedirectToAction("Index", "Inventory");
                 }
             }
             return View(model);
         }
+
 
 
         // GET: Inventory/Edit/{id}
