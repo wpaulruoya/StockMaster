@@ -6,13 +6,23 @@
 
     <form method="post" action="@Url.Action("Authenticate", "User")">
         <div class="form-group">
-            <input type="email" class="form-control" placeholder="Email" required />
+            <label>Email</label>
+            <input type="email" name="email" class="form-control" required />
         </div>
+
         <div class="form-group">
-            <input type="password" class="form-control" placeholder="Password" required />
+            <label>Password</label>
+            <input type="password" name="password" class="form-control" required />
         </div>
-        <button type="submit" class="btn btn-login">Login</button>
+
+        <button type="submit" class="btn btn-primary mt-3">Login</button>
     </form>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="text-danger">@ViewBag.Error</div>
+    }
+
 
     <a href="@Url.Action("Register", "User")" class="link">Don't have an account? Register here</a>
 </div>

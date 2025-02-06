@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container text-center mt-5">
+    <h1 class="display-4">Welcome to StockMaster</h1>
+    <p class="lead">Manage your inventory efficiently</p>
+
+    <div class="mt-4">
+        <a class="btn btn-primary btn-lg m-2" href="@Url.Action("Index", "Inventory")">Go to Inventory</a>
+        <a class="btn btn-danger btn-lg m-2" href="@Url.Action("Logout", "User")">Logout</a>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .container {
+        padding-top: 50px;
+    }
+</style>
