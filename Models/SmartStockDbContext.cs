@@ -11,18 +11,22 @@ namespace StockMaster.Models
         {
         }
 
-        public DbSet<Inventory> Inventories { get; set; } // Inventory table
+        public DbSet<Inventory> Inventories { get; set; } 
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
-            // Ensure cascading delete is handled properly
             builder.Entity<Inventory>()
-                .HasOne<IdentityUser>() // Link Inventory to IdentityUser
+                .Property(i => i.UserId)
+                .HasColumnName("UserId"); // ✅ Explicitly set the column name
+
+            builder.Entity<Inventory>()
+                .HasOne(i => i.User)
                 .WithMany()
                 .HasForeignKey(i => i.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
+
     }
 }

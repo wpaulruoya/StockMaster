@@ -1,4 +1,4 @@
-﻿﻿@Model List<StockMaster.Models.Inventory>
+﻿@model List<StockMaster.Models.Inventory>
 
 @{
     ViewData["Title"] = "My Inventory";
@@ -6,6 +6,12 @@
 
 <div class="container mt-5">
     <h2 class="mb-4">My Inventory</h2>
+
+    <!-- 🔴 Debugging: Show Model Data -->
+    @if (Model != null)
+    {
+        <pre>@Html.Raw(Json.Serialize(Model))</pre> <!-- This will show raw JSON data -->
+    }
 
     @if (TempData["SuccessMessage"] != null)
     {
@@ -33,7 +39,7 @@
         <tbody>
             @if (Model != null && Model.Count > 0)
             {
-                @foreach (var item in Model) 
+                @foreach (var item in Model)
                 {
                     <tr>
                         <td>@item.Name</td>

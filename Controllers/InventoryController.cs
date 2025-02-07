@@ -8,35 +8,45 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 
-
 namespace StockMaster.Controllers
 {
-    [Authorize] // Ensure only logged-in users can access inventory
+    [Authorize]
     public class InventoryController : Controller
     {
         private readonly SmartStockDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public InventoryController(SmartStockDbContext context)
+        public InventoryController(SmartStockDbContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
-
-        // GET: Inventory
-        public IActionResult Index()
+        [Authorize]
+        public async Task<IActionResult> Index()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Get logged-in user ID
-            var userInventory = _context.Inventories.Where(i => i.UserId == userId).ToList(); // Get user's inventory items
+            var userId = _userManager.GetUserId(User);
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
 
-            return View(userInventory); // Pass the inventory list to the view
+            var inventoryItems = await _context.Inventories
+                .AsNoTracking() // Ensure EF doesn't cache stale data
+                .Where(i => i.UserId == userId)
+                .ToListAsync();
+
+            Console.WriteLine($"Found {inventoryItems.Count} items for user {userId}");
+
+            return View(inventoryItems);
         }
 
 
-        // GET: Inventory/Add
         public IActionResult Add()
         {
             return View();
         }
+
         [HttpPost]
         public async Task<IActionResult> Add(Inventory model)
         {
@@ -44,54 +54,75 @@ namespace StockMaster.Controllers
             {
                 try
                 {
-                    // Log the data to see if it's coming through correctly
-                    Console.WriteLine($"Adding Item: {model.Name}, Quantity: {model.Quantity}, Price: {model.Price}");
+                    var userId = _userManager.GetUserId(User); // Get the logged-in user ID
+                    if (userId == null)
+                    {
+                        Console.WriteLine("❌ User ID is null. User is not logged in.");
+                        TempData["ErrorMessage"] = "User not found. Please log in again.";
+                        return RedirectToAction("Login", "User");
+                    }
 
-                    model.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Assign user ID
-                    _context.Inventories.Add(model); // Add item to the context
-                    await _context.SaveChangesAsync(); // Save changes to the database
+                    model.UserId = userId; // Ensure the item is linked to the user
 
-                    // Set success message and redirect to Inventory Index
+                    // 🔴 Debugging: Log the item before saving
+                    Console.WriteLine($"✅ Saving Item: Name={model.Name}, Quantity={model.Quantity}, Price={model.Price}, UserId={model.UserId}");
+
+                    _context.Inventories.Add(model);
+                    int result = await _context.SaveChangesAsync();
+
+                    if (result > 0)
+                    {
+                        Console.WriteLine("✅ Item saved successfully!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("❌ Item was NOT saved!");
+                    }
+
                     TempData["SuccessMessage"] = "Item added successfully!";
-                    return RedirectToAction("Index", "Inventory");
+                    return RedirectToAction("Index");
                 }
                 catch (Exception ex)
                 {
-                    // Log error and show message
-                    Console.WriteLine($"Error: {ex.Message}");
+                    Console.WriteLine($"❌ Error: {ex.Message}");
                     TempData["ErrorMessage"] = "An error occurred while adding the item.";
-                    return RedirectToAction("Index", "Inventory");
                 }
+            }
+            else
+            {
+                Console.WriteLine("❌ Model state is invalid.");
             }
             return View(model);
         }
 
 
 
-
-        // GET: Inventory/Edit/{id}
         public IActionResult Edit(int id)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var item = _context.Inventories.Find(id);
-            if (item == null || item.UserId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+
+            if (item == null || item.UserId != userId)
             {
                 return NotFound();
             }
+
             return View(item);
         }
 
-        // POST: Inventory/Edit
         [HttpPost]
         public async Task<IActionResult> Edit(Inventory model)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var item = _context.Inventories.Find(model.Id);
+
+            if (item == null || item.UserId != userId)
+            {
+                return NotFound();
+            }
+
             if (ModelState.IsValid)
             {
-                var item = _context.Inventories.Find(model.Id);
-                if (item == null || item.UserId != User.FindFirstValue(ClaimTypes.NameIdentifier))
-                {
-                    return NotFound();
-                }
-
                 item.Name = model.Name;
                 item.Quantity = model.Quantity;
                 item.Price = model.Price;
@@ -99,26 +130,30 @@ namespace StockMaster.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
+
             return View(model);
         }
 
-        // GET: Inventory/Delete/{id}
         public IActionResult Delete(int id)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var item = _context.Inventories.Find(id);
-            if (item == null || item.UserId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+
+            if (item == null || item.UserId != userId)
             {
                 return NotFound();
             }
+
             return View(item);
         }
 
-        // POST: Inventory/Delete
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var item = _context.Inventories.Find(id);
-            if (item == null || item.UserId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+
+            if (item == null || item.UserId != userId)
             {
                 return NotFound();
             }

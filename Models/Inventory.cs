@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 
 namespace StockMaster.Models
 {
@@ -16,7 +18,11 @@ namespace StockMaster.Models
         [Required]
         public decimal Price { get; set; }
 
-        public string UserId { get; set; } // Tie inventory to a specific user
-    }
+        [Required]
+        [Column("UserId")] // Ensure correct column mapping
+        public string UserId { get; set; }
 
+        [ForeignKey(nameof(UserId))]
+        public IdentityUser User { get; set; }
+    }
 }
