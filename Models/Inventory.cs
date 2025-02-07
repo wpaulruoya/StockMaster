@@ -16,7 +16,7 @@ namespace StockMaster.Models
         public int Quantity { get; set; }
 
         [Required]
-        public decimal Price { get; set; }
+        public int Price { get; set; } // Changed from decimal to int
 
         [Required]
         [Column("UserId")] // Ensure correct column mapping
