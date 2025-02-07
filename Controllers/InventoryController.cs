@@ -47,53 +47,33 @@ namespace StockMaster.Controllers
             return View();
         }
 
+        [Authorize]
         [HttpPost]
-        public async Task<IActionResult> Add(Inventory model)
+        public async Task<IActionResult> Add(Inventory inventory)
         {
-            if (ModelState.IsValid)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Get logged-in user's ID
+            Console.WriteLine($"Logged-in User ID: {userId}");
+
+            if (string.IsNullOrEmpty(userId))
             {
-                try
-                {
-                    var userId = _userManager.GetUserId(User); // Get the logged-in user ID
-                    if (userId == null)
-                    {
-                        Console.WriteLine("❌ User ID is null. User is not logged in.");
-                        TempData["ErrorMessage"] = "User not found. Please log in again.";
-                        return RedirectToAction("Login", "User");
-                    }
-
-                    model.UserId = userId; // Ensure the item is linked to the user
-
-                    // 🔴 Debugging: Log the item before saving
-                    Console.WriteLine($"✅ Saving Item: Name={model.Name}, Quantity={model.Quantity}, Price={model.Price}, UserId={model.UserId}");
-
-                    _context.Inventories.Add(model);
-                    int result = await _context.SaveChangesAsync();
-
-                    if (result > 0)
-                    {
-                        Console.WriteLine("✅ Item saved successfully!");
-                    }
-                    else
-                    {
-                        Console.WriteLine("❌ Item was NOT saved!");
-                    }
-
-                    TempData["SuccessMessage"] = "Item added successfully!";
-                    return RedirectToAction("Index");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"❌ Error: {ex.Message}");
-                    TempData["ErrorMessage"] = "An error occurred while adding the item.";
-                }
+                ModelState.AddModelError("", "User not found. Please log in.");
+                return View(inventory);
             }
-            else
+
+            if (!ModelState.IsValid)
             {
-                Console.WriteLine("❌ Model state is invalid.");
+                Console.WriteLine("Model state is invalid.");
+                return View(inventory);
             }
-            return View(model);
+
+            inventory.UserId = userId;
+            _context.Inventories.Add(inventory);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
         }
+
+
 
 
 
