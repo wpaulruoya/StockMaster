@@ -21,6 +21,7 @@ namespace StockMaster.Controllers
             _userManager = userManager;
         }
 
+        // ✅ View all inventory items for the logged-in user
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -33,11 +34,17 @@ namespace StockMaster.Controllers
             return View(userInventory);
         }
 
-        public IActionResult Add()
+        // ✅ Show Add Inventory Form with pre-filled UserId
+        public async Task<IActionResult> Add()
         {
-            return View(new Inventory()); // Ensures a model is always passed
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "User");
+
+            var model = new Inventory { UserId = user.Id }; // Ensure UserId is pre-filled
+            return View(model);
         }
 
+        // ✅ Handle adding a new inventory item
         [HttpPost]
         public async Task<IActionResult> Add(Inventory inventory)
         {
@@ -67,6 +74,5 @@ namespace StockMaster.Controllers
                 return View(inventory);
             }
         }
-
     }
 }

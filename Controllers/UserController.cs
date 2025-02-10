@@ -36,24 +36,22 @@ namespace StockMaster.Controllers
                 return View();
             }
 
-            // Ensure the password meets security requirements
-            var passwordValidator = new PasswordValidator<IdentityUser>();
-            var passwordCheck = await passwordValidator.ValidateAsync(_userManager, null, password);
-
-            if (!passwordCheck.Succeeded)
+            if (password != confirmPassword)
             {
-                ViewBag.ErrorMessage = "Password does not meet security requirements.";
+                ViewBag.ErrorMessage = "Passwords do not match.";
                 return View();
             }
+
 
             var user = new IdentityUser { UserName = email, Email = email };
             var result = await _userManager.CreateAsync(user, password);
 
             if (result.Succeeded)
             {
-                ViewBag.SuccessMessage = "Registration successful! Redirecting to login...";
-                return RedirectToAction("Login");
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                return RedirectToAction("Index", "Inventory");
             }
+
             else
             {
                 ViewBag.ErrorMessage = "Registration failed. Please try again.";
