@@ -7,9 +7,12 @@ using StockMaster.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-// 🔹 Configure SQL Server Database
+// 🔹 Configure SQL Server Database for SmartStockDbContext (User Authentication)
 builder.Services.AddDbContext<SmartStockDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// 🔹 Configure SQL Server Database for InventoryDbContext (Inventory Management)
+builder.Services.AddDbContext<InventoryDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // 🔹 Add Identity with EF Core
@@ -20,12 +23,12 @@ builder.Services.AddDefaultIdentity<IdentityUser>()
 builder.Services.AddControllersWithViews();
 
 // 🔹 Add Sessions
-builder.Services.AddDistributedMemoryCache(); // Required for session storage
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout
-    options.Cookie.HttpOnly = true; // Security best practice
-    options.Cookie.IsEssential = true; // Ensures the session is always maintained
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
 });
 
 var app = builder.Build();
@@ -38,7 +41,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles(); // Ensure static files are served (CSS, JS, etc.)
+app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
