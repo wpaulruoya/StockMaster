@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace StockMaster.Migrations
+namespace StockMaster.Migrations.InventoryDb
 {
     /// <inheritdoc />
     public partial class InitialCreate_Inventory : Migration
@@ -46,8 +46,7 @@ namespace StockMaster.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UserId1 = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -56,24 +55,14 @@ namespace StockMaster.Migrations
                         name: "FK_Inventories_IdentityUser_UserId",
                         column: x => x.UserId,
                         principalTable: "IdentityUser",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Inventories_IdentityUser_UserId1",
-                        column: x => x.UserId1,
-                        principalTable: "IdentityUser",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Inventories_UserId",
                 table: "Inventories",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Inventories_UserId1",
-                table: "Inventories",
-                column: "UserId1");
         }
 
         /// <inheritdoc />

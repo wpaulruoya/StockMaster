@@ -11,6 +11,7 @@ namespace StockMaster.Models
         {
         }
 
-      
+        // Ensure Identity tables are created correctly
+        public DbSet<IdentityUser> Users { get; set; }
     }
 }
