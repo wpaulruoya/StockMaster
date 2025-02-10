@@ -11,10 +11,10 @@ namespace StockMaster.Controllers
     [Authorize]
     public class InventoryController : Controller
     {
-        private readonly InventoryDbContext _context;
+        private readonly SmartStockDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public InventoryController(InventoryDbContext context, UserManager<IdentityUser> userManager)
+        public InventoryController(SmartStockDbContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
             _userManager = userManager;

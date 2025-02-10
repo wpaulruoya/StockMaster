@@ -1,28 +1,23 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using StockMaster.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 🔹 Configure SQL Server Database for SmartStockDbContext (User Authentication)
+// ✅ Configure SmartStockDbContext (Only One Context for Users & Inventory)
 builder.Services.AddDbContext<SmartStockDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 🔹 Configure SQL Server Database for InventoryDbContext (Inventory Management)
-builder.Services.AddDbContext<InventoryDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// 🔹 Add Identity with EF Core
+// ✅ Configure Identity
 builder.Services.AddDefaultIdentity<IdentityUser>()
     .AddEntityFrameworkStores<SmartStockDbContext>();
 
-// 🔹 Add Controllers & Views
+// ✅ Add Controllers & Views
 builder.Services.AddControllersWithViews();
 
-// 🔹 Add Sessions
+// ✅ Add Sessions
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -33,7 +28,7 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
-// 🔹 Middleware Pipeline
+// ✅ Middleware Pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -46,7 +41,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// 🔹 Enable Sessions
+// ✅ Enable Sessions
 app.UseSession();
 
 app.MapControllerRoute(
