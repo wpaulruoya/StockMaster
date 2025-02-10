@@ -40,7 +40,7 @@ namespace StockMaster.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Login", "User");
 
-            var model = new Inventory { UserId = user.Id }; // Ensure UserId is pre-filled
+            var model = new Inventory { UserId = user.Id };
             return View(model);
         }
 
@@ -51,7 +51,6 @@ namespace StockMaster.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Login", "User");
 
-            // Assign UserId before checking ModelState
             inventory.UserId = user.Id;
 
             if (!ModelState.IsValid)
@@ -64,7 +63,6 @@ namespace StockMaster.Controllers
             {
                 _context.Inventories.Add(inventory);
                 await _context.SaveChangesAsync();
-
                 TempData["SuccessMessage"] = "Inventory item added successfully!";
                 return RedirectToAction("Index");
             }
@@ -72,6 +70,99 @@ namespace StockMaster.Controllers
             {
                 TempData["ErrorMessage"] = $"Failed to add item: {ex.Message}";
                 return View(inventory);
+            }
+        }
+
+        // ✅ Show Edit Inventory Form
+        public async Task<IActionResult> Edit(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "User");
+
+            var inventory = await _context.Inventories.FirstOrDefaultAsync(i => i.Id == id && i.UserId == user.Id);
+            if (inventory == null)
+            {
+                TempData["ErrorMessage"] = "Inventory item not found.";
+                return RedirectToAction("Index");
+            }
+
+            return View(inventory);
+        }
+
+        // ✅ Handle editing an inventory item
+        [HttpPost]
+        public async Task<IActionResult> Edit(Inventory inventory)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "User");
+
+            if (inventory.UserId != user.Id)
+            {
+                TempData["ErrorMessage"] = "Unauthorized action.";
+                return RedirectToAction("Index");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+                return View(inventory);
+            }
+
+            try
+            {
+                _context.Inventories.Update(inventory);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Inventory item updated successfully!";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Failed to update item: {ex.Message}";
+                return View(inventory);
+            }
+        }
+
+        // ✅ Show Delete Confirmation Page
+        public async Task<IActionResult> Delete(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "User");
+
+            var inventory = await _context.Inventories.FirstOrDefaultAsync(i => i.Id == id && i.UserId == user.Id);
+            if (inventory == null)
+            {
+                TempData["ErrorMessage"] = "Inventory item not found.";
+                return RedirectToAction("Index");
+            }
+
+            return View(inventory);
+        }
+
+        // ✅ Handle deletion of an inventory item
+        [HttpPost]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "User");
+
+            var inventory = await _context.Inventories.FirstOrDefaultAsync(i => i.Id == id && i.UserId == user.Id);
+            if (inventory == null)
+            {
+                TempData["ErrorMessage"] = "Inventory item not found.";
+                return RedirectToAction("Index");
+            }
+
+            try
+            {
+                _context.Inventories.Remove(inventory);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Inventory item deleted successfully!";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Failed to delete item: {ex.Message}";
+                return RedirectToAction("Index");
             }
         }
     }
