@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using StockMaster.Models;
 using System.Linq;
 using System.Threading.Tasks;
+using System;
 
 namespace StockMaster.Controllers
 {
@@ -34,7 +35,7 @@ namespace StockMaster.Controllers
 
         public IActionResult Add()
         {
-            return View();
+            return View(new Inventory()); // Ensures a model is always passed
         }
 
         [HttpPost]
@@ -43,15 +44,27 @@ namespace StockMaster.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Login", "User");
 
-            if (ModelState.IsValid)
+            inventory.UserId = user.Id; // Ensure UserId is set before validation
+
+            if (!ModelState.IsValid)
             {
-                inventory.UserId = user.Id;
-                _context.Inventories.Add(inventory);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Index");
+                TempData["ErrorMessage"] = string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+                return View(inventory);
             }
 
-            return View(inventory);
+            try
+            {
+                _context.Inventories.Add(inventory);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Inventory item added successfully!";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Failed to add item: {ex.Message}";
+                return View(inventory);
+            }
         }
     }
 }

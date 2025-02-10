@@ -1,28 +1,26 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StockMaster.Models
 {
     public class Inventory
     {
-        [Key]
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Name is required.")]
+        [StringLength(100, ErrorMessage = "Name cannot exceed 100 characters.")]
         public string Name { get; set; }
 
-        public string? Description { get; set; }
+        [StringLength(255, ErrorMessage = "Description cannot exceed 255 characters.")]
+        public string Description { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Quantity is required.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Quantity must be at least 1.")]
         public int Quantity { get; set; }
 
-        [Required]
-        [Column(TypeName = "decimal(18,2)")]
+        [Required(ErrorMessage = "Price is required.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0.")]
         public decimal Price { get; set; }
 
-        // ✅ Foreign Key linking to Identity User
-        [Required]
-        [ForeignKey("AspNetUsers")]
-        public string UserId { get; set; }
+        public string UserId { get; set; } // Ensure UserId is always set
     }
 }

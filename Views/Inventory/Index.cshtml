@@ -6,6 +6,16 @@
 
 <h2>Your Inventory</h2>
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
 <a class="btn btn-success mb-3" href="@Url.Action("Add", "Inventory")">Add New Item</a>
 
 @if (Model.Any())
