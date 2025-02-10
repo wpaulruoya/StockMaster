@@ -44,7 +44,8 @@ namespace StockMaster.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Login", "User");
 
-            inventory.UserId = user.Id; // Ensure UserId is set before validation
+            // Assign UserId before checking ModelState
+            inventory.UserId = user.Id;
 
             if (!ModelState.IsValid)
             {
@@ -66,5 +67,6 @@ namespace StockMaster.Controllers
                 return View(inventory);
             }
         }
+
     }
 }

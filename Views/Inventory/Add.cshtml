@@ -18,6 +18,7 @@
 
 <form asp-action="Add" method="post" onsubmit="disableSubmitButton()">
     <div class="form-group">
+        <input type="hidden" asp-for="UserId" />
         <label asp-for="Name"></label>
         <input asp-for="Name" class="form-control" required />
         <span asp-validation-for="Name" class="text-danger"></span>

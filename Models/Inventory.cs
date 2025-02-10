@@ -21,6 +21,8 @@ namespace StockMaster.Models
         [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0.")]
         public decimal Price { get; set; }
 
-        public string UserId { get; set; } // Ensure UserId is always set
+        [Required] // Ensure it's required
+        public string UserId { get; set; }
     }
+
 }
