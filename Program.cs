@@ -7,6 +7,7 @@ using StockMaster.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // 🔹 Configure SQL Server Database
 builder.Services.AddDbContext<SmartStockDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
