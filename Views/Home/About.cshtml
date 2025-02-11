@@ -1,147 +1,131 @@
 ﻿@{
-    ViewData["Title"] = "About StockMaster Solutions";
+    ViewData["Title"] = "About Us";
 }
 
 <div class="about-container">
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Welcome to <span class="highlight">StockMaster Solutions</span></h1>
-            <p>Your all-in-one inventory management system for seamless stock tracking, automation, and reporting.</p>
-        </div>
+    <!-- Hero Section -->
+    <section class="about-hero">
+        <h1>About StockMaster</h1>
+        <p>Empowering businesses with smart inventory management solutions.</p>
     </section>
 
-    <section class="features">
-        <div class="feature-box">
-            <i class="fas fa-box-open"></i>
-            <h3>Efficient Inventory</h3>
-            <p>Track, manage, and update your inventory in real-time with ease.</p>
+    <!-- About Content -->
+    <section class="about-content">
+        <div class="about-box">
+            <h2>Our Mission</h2>
+            <p>At StockMaster, we aim to simplify inventory tracking and management, helping businesses optimize their operations efficiently.</p>
         </div>
-        <div class="feature-box">
-            <i class="fas fa-chart-line"></i>
-            <h3>Powerful Insights</h3>
-            <p>Get detailed reports and analytics for smarter decision-making.</p>
-        </div>
-        <div class="feature-box">
-            <i class="fas fa-shield-alt"></i>
-            <h3>Secure & Reliable</h3>
-            <p>Built with enterprise-grade security to protect your data.</p>
-        </div>
-    </section>
 
-    <section class="cta">
-        <h2>Ready to streamline your inventory?</h2>
-        <a href="@Url.Action("Index", "Inventory")" class="cta-button">Get Started</a>
+        <div class="about-box">
+            <h2>Who We Are</h2>
+            <p>StockMaster is a leading inventory management platform designed for small and medium-sized businesses, ensuring smooth stock control.</p>
+        </div>
+
+        <div class="about-box">
+            <h2>What We Offer</h2>
+            <ul>
+                <li>Real-time inventory tracking</li>
+                <li>Secure user authentication</li>
+                <li>Comprehensive reports and analytics</li>
+                <li>Easy-to-use web interface</li>
+            </ul>
+        </div>
+
+        <div class="about-box">
+            <h2>Contact Us</h2>
+            <p>Need assistance? Reach us at <a href="mailto:support@stockmaster.com">support@stockmaster.com</a>.</p>
+        </div>
     </section>
 </div>
 
 <style>
-    /* General Styles */
-    body {
-        font-family: 'Arial', sans-serif;
-        margin: 0;
-        padding: 0;
-        background: #f5f5f5;
-        color: #333;
-        text-align: center;
+    /* About Page Styling */
+    .about-container {
+        max-width: 900px;
+        margin: auto;
+        padding: 40px 20px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     }
 
     /* Hero Section */
-    .hero {
+    .about-hero {
+        text-align: center;
+        padding: 30px;
         background: linear-gradient(135deg, #1e3c72, #2a5298);
         color: white;
-        padding: 60px 20px;
-        text-align: center;
+        border-radius: 10px 10px 0 0;
     }
 
-        .hero h1 {
-            font-size: 36px;
+        .about-hero h1 {
+            font-size: 32px;
             margin-bottom: 10px;
         }
 
-        .hero .highlight {
-            color: #f39c12;
-        }
-
-        .hero p {
+        .about-hero p {
             font-size: 18px;
             max-width: 600px;
             margin: 0 auto;
         }
 
-    /* Features Section */
-    .features {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 20px;
-        padding: 40px 20px;
+    /* About Sections */
+    .about-content {
+        padding: 20px;
     }
 
-    .feature-box {
-        background: rgba(255, 255, 255, 0.9);
+    .about-box {
+        background: rgba(240, 240, 240, 0.9);
         padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        max-width: 300px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease-in-out;
     }
 
-        .feature-box:hover {
+        .about-box:hover {
             transform: translateY(-5px);
         }
 
-        .feature-box i {
-            font-size: 40px;
-            color: #2a5298;
+        .about-box h2 {
+            color: #e67e22;
+            font-size: 22px;
         }
 
-        .feature-box h3 {
-            margin-top: 10px;
-            font-size: 20px;
+        .about-box p, .about-box ul {
+            font-size: 16px;
+            color: #333;
         }
 
-    /* Call to Action */
-    .cta {
-        background: #e67e22;
-        color: white;
-        padding: 40px 20px;
-    }
-
-        .cta h2 {
-            margin-bottom: 20px;
+        .about-box ul {
+            padding-left: 20px;
         }
 
-    .cta-button {
-        background: white;
-        color: #e67e22;
-        padding: 12px 24px;
-        font-size: 16px;
-        text-decoration: none;
-        border-radius: 6px;
-        transition: 0.3s;
-    }
-
-        .cta-button:hover {
-            background: #fff3e0;
+        .about-box li {
+            margin-bottom: 5px;
         }
 
     /* Responsive Design */
     @@media screen and (max-width: 768px) {
-        .features {
-            flex-direction: column;
-            align-items: center;
+        .about-container {
+            width: 95%;
+            padding: 20px;
         }
 
-        .hero h1 {
-            font-size: 28px;
+        .about-hero h1 {
+            font-size: 26px;
         }
 
-        .hero p {
+        .about-hero p {
             font-size: 16px;
         }
 
-        .cta h2 {
+        .about-box h2 {
             font-size: 20px;
+        }
+
+        .about-box p, .about-box li {
+            font-size: 14px;
         }
     }
 </style>
