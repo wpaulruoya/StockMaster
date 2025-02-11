@@ -1,6 +1,123 @@
 ﻿@{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="privacy-container">
+    <!-- Hero Section -->
+    <section class="privacy-hero">
+        <h1>Privacy Policy</h1>
+        <p>Your privacy is important to us. This page explains how we handle your data.</p>
+    </section>
+
+    <!-- Policy Sections -->
+    <section class="privacy-content">
+        <div class="privacy-box">
+            <h2>1. Information We Collect</h2>
+            <p>We collect personal information such as name, email, and usage data to enhance your experience.</p>
+        </div>
+
+        <div class="privacy-box">
+            <h2>2. How We Use Your Information</h2>
+            <p>Your data is used for account management, security, and service improvements.</p>
+        </div>
+
+        <div class="privacy-box">
+            <h2>3. Data Security</h2>
+            <p>We implement industry-standard security measures to protect your information.</p>
+        </div>
+
+        <div class="privacy-box">
+            <h2>4. Your Rights</h2>
+            <p>You can request data deletion, corrections, or a copy of your stored data at any time.</p>
+        </div>
+
+        <div class="privacy-box">
+            <h2>5. Contact Us</h2>
+            <p>If you have questions about this policy, reach out to us at <a href="mailto:support@stockmaster.com">support@stockmaster.com</a>.</p>
+        </div>
+    </section>
+</div>
+
+<style>
+    /* Privacy Page Styling */
+    .privacy-container {
+        max-width: 900px;
+        margin: auto;
+        padding: 40px 20px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Hero Section */
+    .privacy-hero {
+        text-align: center;
+        padding: 30px;
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        color: white;
+        border-radius: 10px 10px 0 0;
+    }
+
+        .privacy-hero h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .privacy-hero p {
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+    /* Privacy Sections */
+    .privacy-content {
+        padding: 20px;
+    }
+
+    .privacy-box {
+        background: rgba(240, 240, 240, 0.9);
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease-in-out;
+    }
+
+        .privacy-box:hover {
+            transform: translateY(-5px);
+        }
+
+        .privacy-box h2 {
+            color: #e67e22;
+            font-size: 22px;
+        }
+
+        .privacy-box p {
+            font-size: 16px;
+            color: #333;
+        }
+
+    /* Responsive Design */
+    @@media screen and (max-width: 768px) {
+        .privacy-container {
+            width: 95%;
+            padding: 20px;
+        }
+
+        .privacy-hero h1 {
+            font-size: 26px;
+        }
+
+        .privacy-hero p {
+            font-size: 16px;
+        }
+
+        .privacy-box h2 {
+            font-size: 20px;
+        }
+
+        .privacy-box p {
+            font-size: 14px;
+        }
+    }
+</style>
