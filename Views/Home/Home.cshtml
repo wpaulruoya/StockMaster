@@ -1,24 +1,121 @@
-﻿<!-- Home.cshtml -->
-@{
+﻿@{
     ViewData["Title"] = "Dashboard";
 }
 
-<div class="container text-center mt-5">
-    <h1 class="display-4">Welcome to StockMaster</h1>
-    <p class="lead">Manage your inventory efficiently</p>
+<div class="home-container">
+    <!-- Hero Section -->
+    <section class="home-hero">
+        <h1>Welcome to StockMaster</h1>
+        <p>Manage your inventory efficiently and effortlessly.</p>
+        <a class="btn btn-primary btn-lg" href="@Url.Action("Index", "Inventory")">Manage Inventory</a>
+    </section>
 
-    <div class="mt-4">
-        <a class="btn btn-primary btn-lg m-2" href="@Url.Action("Index", "Inventory")">Manage Inventory</a>
-    </div>
+    <!-- Features Section -->
+    <section class="home-features">
+        <div class="feature-box">
+            <h3>📦 Easy Inventory Management</h3>
+            <p>Track and update your stock in real-time with a seamless interface.</p>
+        </div>
+        <div class="feature-box">
+            <h3>🔒 Secure & Reliable</h3>
+            <p>Industry-standard security ensures your data is protected.</p>
+        </div>
+        <div class="feature-box">
+            <h3>📊 Analytics & Reports</h3>
+            <p>Gain insights with advanced reporting tools and analytics.</p>
+        </div>
+    </section>
 </div>
 
-
 <style>
-    body {
-        background-color: #f8f9fa;
+    /* Home Page Styling */
+    .home-container {
+        max-width: 1000px;
+        margin: auto;
+        padding: 40px 20px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
     }
 
-    .container {
-        padding-top: 50px;
+    /* Hero Section */
+    .home-hero {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        color: white;
+        padding: 50px 20px;
+        border-radius: 10px 10px 0 0;
+    }
+
+        .home-hero h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .home-hero p {
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto 20px;
+        }
+
+        .home-hero .btn {
+            font-size: 18px;
+            padding: 12px 25px;
+        }
+
+    /* Features Section */
+    .home-features {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        padding: 30px 20px;
+    }
+
+    .feature-box {
+        background: rgba(240, 240, 240, 0.9);
+        padding: 20px;
+        border-radius: 8px;
+        flex: 1;
+        min-width: 250px;
+        margin: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease-in-out;
+    }
+
+        .feature-box:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-box h3 {
+            font-size: 20px;
+            color: #e67e22;
+        }
+
+        .feature-box p {
+            font-size: 16px;
+            color: #333;
+        }
+
+    /* Responsive Design */
+    @@media screen and (max-width: 768px) {
+        .home-container {
+            width: 95%;
+        }
+
+        .home-hero h1 {
+            font-size: 28px;
+        }
+
+        .home-hero p {
+            font-size: 16px;
+        }
+
+        .feature-box h3 {
+            font-size: 18px;
+        }
+
+        .feature-box p {
+            font-size: 14px;
+        }
     }
 </style>
