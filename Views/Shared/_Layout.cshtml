@@ -14,8 +14,8 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/StockMaster.styles.css" asp-append-version="true" />
 </head>
-<body>
-
+<body class="d-flex flex-column min-vh-100">
+    <!-- Ensures full height layout -->
     @if (!hideTitleBar)
     {
         <header>
@@ -55,7 +55,8 @@
         </header>
     }
 
-    <div class="container">
+    <div class="container flex-grow-1">
+        <!-- Expands to fill space -->
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -63,7 +64,8 @@
 
     @if (!hideTitleBar)
     {
-        <footer class="custom-footer">
+        <footer class="custom-footer mt-auto">
+            <!-- No extra margin -->
             <div class="container text-center">
                 <p class="footer-text">&copy; 2025 - StockMaster | <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a></p>
             </div>
@@ -120,7 +122,7 @@
         color: white;
         text-align: center;
         font-size: 16px;
-        margin-top: 30px;
+        position: relative;
     }
 
         .custom-footer .footer-text {
