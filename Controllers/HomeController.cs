@@ -22,6 +22,12 @@ namespace StockMaster.Controllers
         {
             return View();
         }
+
+        public IActionResult About()
+        {
+            return View();
+        }
+
         public IActionResult Home()
         {
             return View();
