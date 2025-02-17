@@ -27,12 +27,11 @@ namespace StockMaster.Controllers
         }
 
         [HttpPost]
-        [HttpPost]
         public async Task<IActionResult> Register(string fullName, string email, string password, string confirmPassword)
         {
-            if (password != confirmPassword)
+            if (string.IsNullOrWhiteSpace(password))
             {
-                ViewBag.ErrorMessage = "Passwords do not match.";
+                ViewBag.ErrorMessage = "Password cannot be empty.";
                 return View();
             }
 
@@ -41,7 +40,6 @@ namespace StockMaster.Controllers
                 ViewBag.ErrorMessage = "Passwords do not match.";
                 return View();
             }
-
 
             var user = new IdentityUser { UserName = email, Email = email };
             var result = await _userManager.CreateAsync(user, password);
@@ -52,11 +50,8 @@ namespace StockMaster.Controllers
                 return RedirectToAction("Index", "Inventory");
             }
 
-            else
-            {
-                ViewBag.ErrorMessage = "Registration failed. Please try again.";
-                return View();
-            }
+            ViewBag.ErrorMessage = "Registration failed. Please try again.";
+            return View();
         }
 
 
