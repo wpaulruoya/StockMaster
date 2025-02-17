@@ -17,6 +17,9 @@ builder.Services.AddDefaultIdentity<IdentityUser>()
 // ✅ Add Controllers & Views
 builder.Services.AddControllersWithViews();
 
+// ✅ Add API Controllers (New)
+builder.Services.AddControllers();
+
 // ✅ Add Sessions
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -44,8 +47,12 @@ app.UseAuthorization();
 // ✅ Enable Sessions
 app.UseSession();
 
+// ✅ Map MVC Controllers
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// ✅ Map API Controllers (New)
+app.MapControllers();
 
 app.Run();
