@@ -108,5 +108,47 @@ namespace StockMaster.Controllers.Api
                 inventory
             });
         }
+
+        // ✅ ADD A NEW INVENTORY ITEM
+        [HttpPost]
+        public async Task<IActionResult> AddInventory([FromBody] Inventory inventoryItem)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Unauthorized(new { success = false, message = "User not found or not logged in." });
+            }
+
+            if (inventoryItem == null)
+            {
+                return BadRequest(new { success = false, message = "Invalid inventory data." });
+            }
+
+            // ✅ Manually set UserId to the logged-in user's ID before validation
+            inventoryItem.UserId = user.Id;
+
+            if (string.IsNullOrWhiteSpace(inventoryItem.Name) || inventoryItem.Quantity <= 0 || inventoryItem.Price <= 0)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Invalid inventory data. Ensure Name, Quantity, and Price are provided correctly."
+                });
+            }
+
+            try
+            {
+                _context.Inventories.Add(inventoryItem);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction(nameof(GetInventoryByUserId), new { userId = user.Id },
+                    new { success = true, message = "Inventory item added successfully.", inventory = inventoryItem });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "An error occurred while adding inventory." });
+            }
+        }
+
     }
 }
