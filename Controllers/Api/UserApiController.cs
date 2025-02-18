@@ -4,11 +4,12 @@ using System.Threading.Tasks;
 using StockMaster.Models;
 using System;
 using System.Linq;
+using System.Security.Claims;
 
 namespace StockMaster.Controllers.Api
 {
     [Route("api/user")]
-    [ApiController] // Ensures it's treated as an API Controller (no view rendering)
+    [ApiController]
     public class UserApiController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
@@ -44,20 +45,43 @@ namespace StockMaster.Controllers.Api
                 return StatusCode(500, new { Message = "An error occurred during registration.", Error = ex.Message });
             }
         }
-
-        // ✅ LOGIN USER
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            if (!ModelState.IsValid) return BadRequest(new { Message = "Invalid input.", Errors = ModelState });
+            if (model == null)
+            {
+                return BadRequest(new { Message = "Invalid request. Missing body." });
+            }
+
+            if (string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(model.Password))
+            {
+                return BadRequest(new { Message = "Email and Password are required." });
+            }
 
             var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null) return Unauthorized(new { Message = "Invalid email or password." });
+            if (user == null)
+            {
+                return Unauthorized(new { Message = "Invalid email or password." });
+            }
 
-            var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
-            if (!result.Succeeded) return Unauthorized(new { Message = "Invalid email or password." });
+            var isPasswordValid = await _userManager.CheckPasswordAsync(user, model.Password);
+            if (!isPasswordValid)
+            {
+                return Unauthorized(new { Message = "Invalid email or password." });
+            }
+
+            await _signInManager.SignInAsync(user, isPersistent: true);
 
             return Ok(new { Message = "Login successful.", UserDetails = new { user.Email, user.UserName } });
+        }
+
+
+        // ✅ LOGOUT USER
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return Ok(new { Message = "Logout successful." });
         }
 
         // ✅ FETCH USER DETAILS (By Email)
