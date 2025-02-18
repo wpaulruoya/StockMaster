@@ -72,8 +72,19 @@ namespace StockMaster.Controllers.Api
 
             await _signInManager.SignInAsync(user, isPersistent: true);
 
-            return Ok(new { Message = "Login successful.", UserDetails = new { user.Email, user.UserName } });
+            return Ok(new
+            {
+                Message = "Login successful.",
+                UserDetails = new Dictionary<string, string>
+    {
+        { "Email", user.Email },
+        { "UserName", user.UserName },
+        { "UserId", user.Id }
+    }
+            });
+
         }
+
 
 
         // ✅ LOGOUT USER
