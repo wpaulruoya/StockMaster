@@ -24,26 +24,18 @@ namespace StockMaster.Controllers.Api
             _userManager = userManager;
         }
 
+        // ✅ VIEW INVENTORY ITEMS FOR LOGGED-IN USER
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Inventory>>> GetInventory()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Unauthorized();
 
-            return await _context.Inventories.Where(i => i.UserId == user.Id).ToListAsync();
-        }
+            var inventory = await _context.Inventories
+                                          .Where(i => i.UserId == user.Id)
+                                          .ToListAsync();
 
-        [HttpPost]
-        public async Task<IActionResult> AddInventory([FromBody] Inventory inventory)
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Unauthorized();
-
-            inventory.UserId = user.Id;
-            _context.Inventories.Add(inventory);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetInventory), new { id = inventory.Id }, inventory);
+            return Ok(inventory);
         }
     }
 }
