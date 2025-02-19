@@ -47,7 +47,7 @@ namespace StockMaster.Controllers
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, isPersistent: false);
-                return RedirectToAction("Index", "Inventory");
+                return RedirectToAction("Login", "User");
             }
 
             ViewBag.ErrorMessage = "Registration failed. Please try again.";
