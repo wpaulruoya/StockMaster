@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using StockMaster.Models;
 using Microsoft.OpenApi.Models;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // ✅ Configure SmartStockDbContext
@@ -22,6 +21,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequiredLength = 6;
 })
+    .AddRoles<IdentityRole>() // ✅ Enable Roles
     .AddEntityFrameworkStores<SmartStockDbContext>();
 
 // ✅ Add API Controllers and MVC Controllers separately
@@ -84,6 +84,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// ✅ Create Roles and Super Admin at Startup
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await CreateRolesAndSuperAdmin(services);
+}
+
 // ✅ Map API Controllers Correctly
 app.MapControllers(); // Ensures API controllers are handled properly
 
@@ -101,3 +108,38 @@ foreach (var endpoint in app.Services.GetRequiredService<Microsoft.AspNetCore.Ro
 
 // ✅ Start the app
 app.Run();
+
+// =======================================================
+// ✅ Function to Create Roles & Super Admin at Startup
+// =======================================================
+async Task CreateRolesAndSuperAdmin(IServiceProvider serviceProvider)
+{
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+    string[] roleNames = { "SuperAdmin", "Admin", "User" };
+
+    foreach (var role in roleNames)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+
+    // ✅ Create Super Admin if not exists
+    string adminEmail = "admin";
+    string adminPassword = "Admin@2025";
+
+    var superAdmin = await userManager.FindByNameAsync(adminEmail);
+    if (superAdmin == null)
+    {
+        var user = new IdentityUser { UserName = adminEmail, Email = adminEmail };
+        var result = await userManager.CreateAsync(user, adminPassword);
+
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(user, "SuperAdmin");
+        }
+    }
+}
