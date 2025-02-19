@@ -1,6 +1,14 @@
 ﻿@{
     ViewData["HideTitleBar"] = true;
 }
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
 <div class="container-box">
     <h1>Login to StockMaster</h1>
 
@@ -22,7 +30,6 @@
     {
         <div class="text-danger">@ViewBag.Error</div>
     }
-
 
     <a href="@Url.Action("Register", "User")" class="link">Don't have an account? Register here</a>
 </div>
@@ -53,8 +60,6 @@
         left: 50%;
         transform: translate(-50%, -50%);
     }
-
-
 
     .form-group {
         margin-bottom: 15px;

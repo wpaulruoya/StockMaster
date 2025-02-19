@@ -46,14 +46,13 @@ namespace StockMaster.Controllers
 
             if (result.Succeeded)
             {
-                await _signInManager.SignInAsync(user, isPersistent: false);
+                TempData["SuccessMessage"] = "Registration successful! You can now log in.";
                 return RedirectToAction("Login", "User");
             }
 
             ViewBag.ErrorMessage = "Registration failed. Please try again.";
             return View();
         }
-
 
         [HttpPost]
         public async Task<IActionResult> Authenticate(string email, string password)
@@ -72,12 +71,12 @@ namespace StockMaster.Controllers
             ViewBag.Error = "Invalid email or password.";
             return View("Login");
         }
+
         [HttpPost]
         public IActionResult Logout()
         {
-            HttpContext.Session.Clear(); // Clear session data
-            return RedirectToAction("Index", "Home"); // Redirect to landing page
+            HttpContext.Session.Clear();
+            return RedirectToAction("Index", "Home");
         }
-
     }
 }
