@@ -207,6 +207,39 @@ namespace StockMaster.Controllers.Api
 
             return Ok(new { success = true, message = "Inventory item updated successfully.", changes, inventory = inventoryItem });
         }
+        // ✅ DELETE AN INVENTORY ITEM
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteInventory(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Unauthorized(new { success = false, message = "User not found or not logged in." });
+            }
+
+            var inventoryItem = await _context.Inventories.FindAsync(id);
+            if (inventoryItem == null)
+            {
+                return NotFound(new { success = false, message = "Inventory item not found." });
+            }
+
+            if (inventoryItem.UserId != user.Id)
+            {
+                return Forbid();
+            }
+
+            try
+            {
+                _context.Inventories.Remove(inventoryItem);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { success = true, message = "Inventory item deleted successfully.", deletedItemId = id });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "An error occurred while deleting inventory." });
+            }
+        }
 
     }
 }
