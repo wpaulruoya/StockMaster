@@ -141,13 +141,71 @@ namespace StockMaster.Controllers.Api
                 _context.Inventories.Add(inventoryItem);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(GetInventoryByUserId), new { userId = user.Id },
+                return CreatedAtAction(nameof(GetInventory), new { id = inventoryItem.Id },
                     new { success = true, message = "Inventory item added successfully.", inventory = inventoryItem });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { success = false, message = "An error occurred while adding inventory." });
             }
+        }
+
+        // ✅ UPDATE AN EXISTING INVENTORY ITEM WITH FEEDBACK ON CHANGES
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateInventory(int id, [FromBody] Inventory updatedInventory)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Unauthorized(new { success = false, message = "User not found or not logged in." });
+            }
+
+            var inventoryItem = await _context.Inventories.FindAsync(id);
+            if (inventoryItem == null)
+            {
+                return NotFound(new { success = false, message = "Inventory item not found." });
+            }
+
+            if (inventoryItem.UserId != user.Id)
+            {
+                return Forbid();
+            }
+
+            // ✅ Assign UserId to logged-in user instead of requiring it in request body
+            updatedInventory.UserId = user.Id;
+
+            var changes = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(updatedInventory.Name) && updatedInventory.Name != inventoryItem.Name)
+            {
+                changes.Add($"Name: '{inventoryItem.Name}' → '{updatedInventory.Name}'");
+                inventoryItem.Name = updatedInventory.Name;
+            }
+            if (!string.IsNullOrWhiteSpace(updatedInventory.Description) && updatedInventory.Description != inventoryItem.Description)
+            {
+                changes.Add($"Description: '{inventoryItem.Description}' → '{updatedInventory.Description}'");
+                inventoryItem.Description = updatedInventory.Description;
+            }
+            if (updatedInventory.Quantity > 0 && updatedInventory.Quantity != inventoryItem.Quantity)
+            {
+                changes.Add($"Quantity: {inventoryItem.Quantity} → {updatedInventory.Quantity}");
+                inventoryItem.Quantity = updatedInventory.Quantity;
+            }
+            if (updatedInventory.Price > 0 && updatedInventory.Price != inventoryItem.Price)
+            {
+                changes.Add($"Price: {inventoryItem.Price} → {updatedInventory.Price}");
+                inventoryItem.Price = updatedInventory.Price;
+            }
+
+            if (!changes.Any())
+            {
+                return BadRequest(new { success = false, message = "No changes detected." });
+            }
+
+            _context.Inventories.Update(inventoryItem);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Inventory item updated successfully.", changes, inventory = inventoryItem });
         }
 
     }
