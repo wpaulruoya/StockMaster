@@ -1,4 +1,6 @@
-﻿@{
+﻿@model List<StockMaster.Models.InventoryViewModel>
+
+@{
     Layout = null;
 }
 
@@ -7,7 +9,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Roles</title>
+    <title>Manage Inventory</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         body {
@@ -82,12 +84,21 @@
             border-radius: 10px;
         }
 
+        .collapsed {
+            transform: translateX(-250px);
+        }
+
+            .collapsed + .toggle-btn {
+                left: 10px;
+            }
+
         .container {
+            width: 90%;
+            margin: 20px auto;
             background: white;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
         }
 
         .table {
@@ -107,38 +118,16 @@
                 color: white;
             }
 
-        .btn-danger {
-            background: #e74c3c;
-            color: white;
+        .btn {
             padding: 8px 12px;
             text-decoration: none;
             border-radius: 5px;
             display: inline-block;
         }
 
-        .collapsed {
-            transform: translateX(-250px);
-        }
-
-            .collapsed + .toggle-btn {
-                left: 10px;
-            }
-
-        @@media (max-width: 768px) {
-            .sidebar
-
-        {
-            transform: translateX(-250px);
-        }
-
-        .toggle-btn {
-            left: 10px;
-        }
-
-        .content {
-            margin-left: 0;
-        }
-
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
         }
     </style>
 </head>
@@ -148,55 +137,39 @@
         <ul>
             <li><a asp-controller="SuperAdmin" asp-action="Dashboard">Dashboard</a></li>
             <li><a asp-controller="SuperAdmin" asp-action="ManageUsers">Manage Users</a></li>
-            <li><a asp-controller="SuperAdmin" asp-action="ManageRoles">Manage Roles</a></li>
-            <li>
-                <form method="post" asp-controller="User" asp-action="Logout">
-                    <button type="submit" class="btn btn-danger" style="width: 100%; border: none; padding: 15px; background: none; color: white; cursor: pointer; text-align: center;">Logout</button>
-                </form>
-            </li>
+            <li><a asp-controller="SuperAdmin" asp-action="ManageInventory">Manage Inventory</a></li>
         </ul>
     </div>
-    <div class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">
-        <i class="fas fa-bars"></i>
-    </div>
-    <div class="content" id="content">
+    <div class="content">
         <div class="dashboard-header">
-            <h1>Manage Roles</h1>
+            <h1>Manage Inventory</h1>
         </div>
         <div class="container">
-            <h2 class="text-primary text-center">Manage Roles</h2>
+            <h2>Inventory Items</h2>
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Role Name</th>
-                        <th>Actions</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Owner</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var role in Model)
+                    @foreach (var item in Model)
                     {
                         <tr>
-                            <td>@role.Name</td>
-                            <td>
-                                <a href="/SuperAdmin/DeleteRole?id=@role.Id" class="btn btn-danger">Delete</a>
-                            </td>
+                            <td>@item.Name</td>
+                            <td>@item.Description</td>
+                            <td>@item.Quantity</td>
+                            <td>@item.Price</td>
+                            <td>@item.UserEmail</td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
     </div>
-    <script>
-        function toggleSidebar() {
-            let sidebar = document.getElementById("sidebar");
-            let content = document.getElementById("content");
-            sidebar.classList.toggle("collapsed");
-            if (sidebar.classList.contains("collapsed")) {
-                content.style.marginLeft = "0";
-            } else {
-                content.style.marginLeft = "250px";
-            }
-        }
-    </script>
 </body>
 </html>
