@@ -1,7 +1,5 @@
-﻿### manageroles.cshtml
-
-@{
-    ViewData["Title"] = "Manage Roles";
+﻿@{
+    Layout = null;
 }
 
 <!DOCTYPE html>
@@ -9,18 +7,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewData["Title"]</title>
-    
+    <title>Manage Roles</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+        }
+
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+            .table th, .table td {
+                border: 1px solid #ddd;
+                padding: 10px;
+                text-align: left;
+            }
+
+            .table th {
+                background: #3498db;
+                color: white;
+            }
+
+        .btn {
+            padding: 8px 12px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <div class="header">
         Super Admin Panel
-        <a href="/Account/Logout" class="btn btn-danger logout-btn">Logout</a>
+        <a href="/Account/Logout" class="btn btn-danger" style="float: right;">Logout</a>
     </div>
-
     <div class="container">
         <h2 class="text-primary text-center">Manage Roles</h2>
-        <table class="table table-bordered">
+        <table class="table">
             <thead>
                 <tr>
                     <th>Role Name</th>
@@ -28,14 +78,14 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var role in Model)
+                @@foreach (var role in Model)
                 {
-                    <tr>
-                        <td>@role.Name</td>
-                        <td>
-                            <a href="/SuperAdmin/DeleteRole?id=@role.Id" class="btn btn-danger">Delete</a>
-                        </td>
-                    </tr>
+                <tr>
+                    <td>@@role.Name</td>
+                    <td>
+                        <a href="/SuperAdmin/DeleteRole?id=@@role.Id" class="btn btn-danger">Delete</a>
+                    </td>
+                </tr>
                 }
             </tbody>
         </table>
