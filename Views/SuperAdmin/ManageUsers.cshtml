@@ -32,7 +32,6 @@
             position: fixed;
             height: 100vh;
             padding-top: 20px;
-            transition: transform 0.3s ease-in-out;
         }
 
             .sidebar h2 {
@@ -65,7 +64,6 @@
             margin-left: 250px;
             padding: 20px;
             width: 100%;
-            transition: margin-left 0.3s ease-in-out;
         }
 
         .dashboard-header {
@@ -149,6 +147,9 @@
                             <td>@user.Email</td>
                             <td>
                                 <button class="btn btn-warning" onclick="confirmDemote('@user.Id', '@user.Email');">Demote</button>
+                                <button class="btn btn-info" onclick="changePassword('@user.Id', '@user.Email');">
+                                    <i class="fas fa-key"></i> Change Password
+                                </button>
                             </td>
                         </tr>
                     }
@@ -168,6 +169,9 @@
                             <td>
                                 <button class="btn btn-success" onclick="confirmPromote('@user.Id', '@user.Email');">Promote</button>
                                 <button class="btn btn-danger" onclick="confirmDelete('@user.Id', '@user.Email');">Delete</button>
+                                <button class="btn btn-info" onclick="changePassword('@user.Id', '@user.Email');">
+                                    <i class="fas fa-key"></i> Change Password
+                                </button>
                             </td>
                         </tr>
                     }
@@ -176,64 +180,32 @@
         </div>
     </div>
 
-    <!-- jQuery, SweetAlert2, and Toastr -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.10.3/sweetalert2.all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     <script>
-        function sendRequest(url, successMessage) {
-            $.ajax({
-                type: "POST",
-                url: url,
-                success: function () {
-                    Swal.fire({
-                        icon: "success",
-                        title: "Success!",
-                        text: successMessage,
-                        showConfirmButton: false,
-                        timer: 2000
-                    });
-                    setTimeout(function () { location.reload(); }, 2000);
-                },
-                error: function () {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Error",
-                        text: "An error occurred. Please try again."
-                    });
-                }
-            });
-        }
-
-        function confirmDelete(userId, email) {
-            Swal.fire({
-                title: "Are you sure?",
-                text: "You are about to delete '" + email + "'. This action is irreversible!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#3085d6",
-                confirmButtonText: "Yes, Delete!"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    sendRequest("/SuperAdmin/DeleteUser?id=" + userId, "User '" + email + "' deleted successfully.");
-                }
-            });
-        }
-
-        function confirmPromote(userId, email) {
+               function confirmPromote(userId, email) {
             Swal.fire({
                 title: "Promote User?",
-                text: "Are you sure you want to promote '" + email + "' to Admin?",
-                icon: "question",
+                text: `Are you sure you want to promote ${email} to Admin?`,
+                icon: "warning",
                 showCancelButton: true,
-                confirmButtonColor: "#28a745",
-                cancelButtonColor: "#3085d6",
-                confirmButtonText: "Yes, Promote!"
+                confirmButtonText: "Yes, Promote"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    sendRequest("/SuperAdmin/PromoteUser?id=" + userId, "User '" + email + "' promoted to Admin.");
+                    $.ajax({
+                        url: "/SuperAdmin/PromoteUser",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({ userId: userId }),
+                        success: function(response) {
+                            Swal.fire("Success!", response.message, "success").then(() => location.reload());
+                        },
+                        error: function(xhr) {
+                            Swal.fire("Error!", "Something went wrong. Please try again.", "error");
+                        }
+                    });
                 }
             });
         }
@@ -241,19 +213,55 @@
         function confirmDemote(userId, email) {
             Swal.fire({
                 title: "Demote Admin?",
-                text: "Are you sure you want to demote '" + email + "' to a normal user?",
+                text: `Are you sure you want to demote ${email} to User?`,
                 icon: "warning",
                 showCancelButton: true,
-                confirmButtonColor: "#f39c12",
-                cancelButtonColor: "#3085d6",
-                confirmButtonText: "Yes, Demote!"
+                confirmButtonText: "Yes, Demote"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    sendRequest("/SuperAdmin/DemoteUser?id=" + userId, "User '" + email + "' demoted to Normal User.");
+                    $.ajax({
+                        url: "/SuperAdmin/DemoteUser",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({ userId: userId }),
+                        success: function(response) {
+                            Swal.fire("Success!", response.message, "success").then(() => location.reload());
+                        },
+                        error: function(xhr) {
+                            Swal.fire("Error!", "Something went wrong. Please try again.", "error");
+                        }
+                    });
                 }
             });
         }
+
+        function confirmDelete(userId, email) {
+            Swal.fire({
+                title: "Delete User?",
+                text: `Are you sure you want to delete ${email}? This action cannot be undone!`,
+                icon: "error",
+                showCancelButton: true,
+                confirmButtonText: "Yes, Delete"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/SuperAdmin/DeleteUser",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({ userId: userId }),
+                        success: function(response) {
+                            Swal.fire("Deleted!", response.message, "success").then(() => location.reload());
+                        },
+                        error: function(xhr) {
+                            Swal.fire("Error!", "Something went wrong. Please try again.", "error");
+                        }
+                    });
+                }
+            });
+        }
+
     </script>
+
 
 </body>
 </html>
