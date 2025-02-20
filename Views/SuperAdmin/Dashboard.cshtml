@@ -49,6 +49,12 @@
                         background: #34495e;
                     }
 
+                    .sidebar ul li a {
+                        color: white;
+                        text-decoration: none;
+                        display: block;
+                    }
+
         .toggle-btn {
             position: absolute;
             top: 20px;
@@ -64,8 +70,8 @@
         .content {
             margin-left: 250px;
             padding: 20px;
-            width: calc(100% - 250px);
-            transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+            width: 100%;
+            transition: margin-left 0.3s ease-in-out;
         }
 
         .dashboard-header {
@@ -83,20 +89,11 @@
             .collapsed + .toggle-btn {
                 left: 10px;
             }
-
-        .expanded-content {
-            margin-left: 0;
-            width: 100%;
-        }
-
         @@media (max-width: 768px) {
             .sidebar
 
         {
             transform: translateX(-250px);
-            position: absolute;
-            width: 250px;
-            transition: transform 0.3s ease-in-out;
         }
 
         .toggle-btn {
@@ -105,7 +102,6 @@
 
         .content {
             margin-left: 0;
-            width: 100%;
         }
 
         }
@@ -115,11 +111,14 @@
     <div class="sidebar" id="sidebar">
         <h2>Super Admin</h2>
         <ul>
-            <li>Dashboard</li>
-            <li>Manage Users</li>
-            <li>Manage Roles</li>
-            <li>Settings</li>
-            <li>Logout</li>
+            <li><a asp-controller="SuperAdmin" asp-action="Dashboard">Dashboard</a></li>
+            <li><a asp-controller="SuperAdmin" asp-action="ManageUsers">Manage Users</a></li>
+            <li><a asp-controller="SuperAdmin" asp-action="ManageRoles">Manage Roles</a></li>
+            <li>
+                <form method="post" asp-controller="User" asp-action="Logout">
+                    <button type="submit" class="btn btn-danger" style="width: 100%; border: none; padding: 15px; background: none; color: white; cursor: pointer; text-align: center;">Logout</button>
+                </form>
+            </li>
         </ul>
     </div>
     <div class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">
@@ -135,16 +134,11 @@
         function toggleSidebar() {
             let sidebar = document.getElementById("sidebar");
             let content = document.getElementById("content");
-            let toggleBtn = document.getElementById("toggleBtn");
-
+            sidebar.classList.toggle("collapsed");
             if (sidebar.classList.contains("collapsed")) {
-                sidebar.classList.remove("collapsed");
-                content.classList.remove("expanded-content");
-                toggleBtn.style.left = "260px";
+                content.style.marginLeft = "0";
             } else {
-                sidebar.classList.add("collapsed");
-                content.classList.add("expanded-content");
-                toggleBtn.style.left = "10px";
+                content.style.marginLeft = "250px";
             }
         }
     </script>
