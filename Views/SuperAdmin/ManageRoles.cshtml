@@ -1,5 +1,53 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Manage Roles";
 }
+
+<style>
+    .roles-container {
+        max-width: 600px;
+        margin: 50px auto;
+        background: #f1f1f1;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .roles-title {
+        color: #dc3545;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .table th {
+        background: #28a745;
+        color: white;
+    }
+
+    .btn-delete {
+        padding: 5px 10px;
+        font-size: 14px;
+    }
+</style>
+
+<div class="roles-container">
+    <h2 class="roles-title">Manage Roles</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Role Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var role in Model)
+            {
+                <tr>
+                    <td>@role.Name</td>
+                    <td>
+                        <a href="/SuperAdmin/DeleteRole?id=@role.Id" class="btn btn-danger btn-delete">Delete Role</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
