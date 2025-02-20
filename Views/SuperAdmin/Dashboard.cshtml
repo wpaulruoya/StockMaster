@@ -64,8 +64,8 @@
         .content {
             margin-left: 250px;
             padding: 20px;
-            width: 100%;
-            transition: margin-left 0.3s ease-in-out;
+            width: calc(100% - 250px);
+            transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
         }
 
         .dashboard-header {
@@ -83,11 +83,20 @@
             .collapsed + .toggle-btn {
                 left: 10px;
             }
+
+        .expanded-content {
+            margin-left: 0;
+            width: 100%;
+        }
+
         @@media (max-width: 768px) {
             .sidebar
 
         {
             transform: translateX(-250px);
+            position: absolute;
+            width: 250px;
+            transition: transform 0.3s ease-in-out;
         }
 
         .toggle-btn {
@@ -96,6 +105,7 @@
 
         .content {
             margin-left: 0;
+            width: 100%;
         }
 
         }
@@ -124,8 +134,18 @@
     <script>
         function toggleSidebar() {
             let sidebar = document.getElementById("sidebar");
+            let content = document.getElementById("content");
             let toggleBtn = document.getElementById("toggleBtn");
-            sidebar.classList.toggle("collapsed");
+
+            if (sidebar.classList.contains("collapsed")) {
+                sidebar.classList.remove("collapsed");
+                content.classList.remove("expanded-content");
+                toggleBtn.style.left = "260px";
+            } else {
+                sidebar.classList.add("collapsed");
+                content.classList.add("expanded-content");
+                toggleBtn.style.left = "10px";
+            }
         }
     </script>
 </body>
