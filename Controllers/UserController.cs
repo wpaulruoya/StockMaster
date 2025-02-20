@@ -46,6 +46,7 @@ namespace StockMaster.Controllers
 
             if (result.Succeeded)
             {
+                await _userManager.AddToRoleAsync(user, "User"); // Default role assigned
                 TempData["SuccessMessage"] = "Registration successful! You can now log in.";
                 return RedirectToAction("Login", "User");
             }
@@ -64,6 +65,13 @@ namespace StockMaster.Controllers
                 if (result.Succeeded)
                 {
                     HttpContext.Session.SetString("UserEmail", email);
+
+                    // Check if the logged-in user is a Super Admin
+                    if (await _userManager.IsInRoleAsync(user, "SuperAdmin"))
+                    {
+                        return RedirectToAction("Dashboard", "SuperAdmin");
+                    }
+
                     return RedirectToAction("Home", "Home");
                 }
             }

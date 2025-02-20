@@ -127,14 +127,14 @@ async Task CreateRolesAndSuperAdmin(IServiceProvider serviceProvider)
         }
     }
 
-    // ✅ Create Super Admin if not exists
-    string adminEmail = "admin";
-    string adminPassword = "Admin@2025";
+    // ✅ Update Super Admin credentials
+    string adminEmail = "StockMaster@gmail.com";  // New Super Admin email
+    string adminPassword = "Admin@2025";         // Keep the same password
 
-    var superAdmin = await userManager.FindByNameAsync(adminEmail);
+    var superAdmin = await userManager.FindByEmailAsync(adminEmail);
     if (superAdmin == null)
     {
-        var user = new IdentityUser { UserName = adminEmail, Email = adminEmail };
+        var user = new IdentityUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
         var result = await userManager.CreateAsync(user, adminPassword);
 
         if (result.Succeeded)
@@ -142,4 +142,11 @@ async Task CreateRolesAndSuperAdmin(IServiceProvider serviceProvider)
             await userManager.AddToRoleAsync(user, "SuperAdmin");
         }
     }
+    else
+    {
+        // ✅ Reset password for Super Admin
+        await userManager.RemovePasswordAsync(superAdmin);
+        await userManager.AddPasswordAsync(superAdmin, adminPassword);
+    }
+
 }
