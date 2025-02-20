@@ -8,29 +8,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Roles</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            display: flex;
             background: #f4f4f4;
         }
 
+        .sidebar {
+            width: 250px;
+            background: #2c3e50;
+            color: white;
+            position: fixed;
+            height: 100vh;
+            transition: transform 0.3s ease-in-out;
+            padding-top: 20px;
+            transform: translateX(0);
+        }
+
+            .sidebar h2 {
+                text-align: center;
+            }
+
+            .sidebar ul {
+                list-style: none;
+                padding: 0;
+            }
+
+                .sidebar ul li {
+                    padding: 15px;
+                    text-align: center;
+                    cursor: pointer;
+                    transition: 0.3s;
+                }
+
+                    .sidebar ul li:hover {
+                        background: #34495e;
+                    }
+
+                    .sidebar ul li a {
+                        color: white;
+                        text-decoration: none;
+                        display: block;
+                    }
+
+        .toggle-btn {
+            position: absolute;
+            top: 20px;
+            left: 260px;
+            background: #2c3e50;
+            color: white;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: left 0.3s ease-in-out;
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            width: 100%;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .dashboard-header {
+            background: #3498db;
+            padding: 20px;
+            color: white;
+            text-align: center;
+            border-radius: 10px;
+        }
+
         .container {
-            width: 80%;
-            margin: 50px auto;
             background: white;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .header {
-            background: #2c3e50;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            border-radius: 10px 10px 0 0;
+            margin-top: 20px;
         }
 
         .table {
@@ -50,45 +107,96 @@
                 color: white;
             }
 
-        .btn {
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
             padding: 8px 12px;
             text-decoration: none;
             border-radius: 5px;
             display: inline-block;
         }
 
-        .btn-danger {
-            background: #e74c3c;
-            color: white;
+        .collapsed {
+            transform: translateX(-250px);
+        }
+
+            .collapsed + .toggle-btn {
+                left: 10px;
+            }
+
+        @@media (max-width: 768px) {
+            .sidebar
+
+        {
+            transform: translateX(-250px);
+        }
+
+        .toggle-btn {
+            left: 10px;
+        }
+
+        .content {
+            margin-left: 0;
+        }
+
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        Super Admin Panel
-        <a href="/Account/Logout" class="btn btn-danger" style="float: right;">Logout</a>
+    <div class="sidebar" id="sidebar">
+        <h2>Super Admin</h2>
+        <ul>
+            <li><a asp-controller="SuperAdmin" asp-action="Dashboard">Dashboard</a></li>
+            <li><a asp-controller="SuperAdmin" asp-action="ManageUsers">Manage Users</a></li>
+            <li><a asp-controller="SuperAdmin" asp-action="ManageRoles">Manage Roles</a></li>
+            <li>
+                <form method="post" asp-controller="User" asp-action="Logout">
+                    <button type="submit" class="btn btn-danger" style="width: 100%; border: none; padding: 15px; background: none; color: white; cursor: pointer; text-align: center;">Logout</button>
+                </form>
+            </li>
+        </ul>
     </div>
-    <div class="container">
-        <h2 class="text-primary text-center">Manage Roles</h2>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Role Name</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @@foreach (var role in Model)
-                {
-                <tr>
-                    <td>@@role.Name</td>
-                    <td>
-                        <a href="/SuperAdmin/DeleteRole?id=@@role.Id" class="btn btn-danger">Delete</a>
-                    </td>
-                </tr>
-                }
-            </tbody>
-        </table>
+    <div class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
     </div>
+    <div class="content" id="content">
+        <div class="dashboard-header">
+            <h1>Manage Roles</h1>
+        </div>
+        <div class="container">
+            <h2 class="text-primary text-center">Manage Roles</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Role Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var role in Model)
+                    {
+                        <tr>
+                            <td>@role.Name</td>
+                            <td>
+                                <a href="/SuperAdmin/DeleteRole?id=@role.Id" class="btn btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        function toggleSidebar() {
+            let sidebar = document.getElementById("sidebar");
+            let content = document.getElementById("content");
+            sidebar.classList.toggle("collapsed");
+            if (sidebar.classList.contains("collapsed")) {
+                content.style.marginLeft = "0";
+            } else {
+                content.style.marginLeft = "250px";
+            }
+        }
+    </script>
 </body>
 </html>
