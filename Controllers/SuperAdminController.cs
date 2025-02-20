@@ -21,10 +21,34 @@ namespace StockMaster.Controllers
             _context = context;
         }
 
-        public IActionResult Dashboard()
+
+        public async Task<IActionResult> Dashboard()
         {
+            var totalUsers = _userManager.Users.Count();
+            var totalInventory = _context.Inventories.Count();
+
+            // Get all users and check their roles in memory
+            var users = _userManager.Users.ToList();
+            int adminCount = 0;
+
+            foreach (var user in users)
+            {
+                if (await _userManager.IsInRoleAsync(user, "Admin"))
+                {
+                    adminCount++;
+                }
+            }
+
+            var userCount = totalUsers - adminCount;
+
+            ViewBag.TotalUsers = totalUsers;
+            ViewBag.TotalInventory = totalInventory;
+            ViewBag.AdminCount = adminCount;
+            ViewBag.UserCount = userCount;
+
             return View();
         }
+
 
         // ✅ Manage Users
         public async Task<IActionResult> ManageUsers()
