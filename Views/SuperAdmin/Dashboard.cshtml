@@ -27,6 +27,7 @@
     <h2 class="dashboard-title">Super Admin Dashboard</h2>
     <p>Welcome, Super Admin! You have full control over the system.</p>
 
-    <a href="/SuperAdmin/ManageUsers" class="btn btn-success dashboard-btn">Manage Users</a>
-    <a href="/SuperAdmin/ManageRoles" class="btn btn-info dashboard-btn">Manage Roles</a>
+    <a asp-controller="SuperAdmin" asp-action="ManageUsers" class="btn btn-success dashboard-btn">Manage Users</a>
+    <a asp-controller="SuperAdmin" asp-action="ManageRoles" class="btn btn-info dashboard-btn">Manage Roles</a>
+
 </div>
