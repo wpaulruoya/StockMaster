@@ -1,103 +1,69 @@
-﻿@{
+﻿### manageroles.cshtml
+
+@{
     ViewData["Title"] = "Manage Roles";
 }
 
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #f4f4f4;
-        margin: 0;
-        padding: 0;
-    }
-
-    .container {
-        max-width: 1000px;
-        margin: 50px auto;
-        padding: 20px;
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .header, .footer {
-        background: #007bff;
-        color: white;
-        padding: 15px;
-        text-align: center;
-        font-size: 18px;
-        position: relative;
-    }
-
-    .logout-btn {
-        position: absolute;
-        right: 20px;
-        top: 15px;
-        background: #dc3545;
-        color: white;
-        border: none;
-        padding: 8px 12px;
-        border-radius: 5px;
-        text-decoration: none;
-    }
-
-        .logout-btn:hover {
-            background: #c82333;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: #f4f4f4;
+            font-family: Arial, sans-serif;
         }
 
-    .page-title {
-        color: #007bff;
-        text-align: center;
-        margin-bottom: 20px;
-    }
+        .container {
+            max-width: 1000px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
 
-    .table-container {
-        overflow-x: auto;
-    }
+        .header, .footer {
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 18px;
+        }
 
-    .table {
-        width: 100%;
-        border-collapse: collapse;
-    }
+        .logout-btn {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+        }
 
         .table th {
             background: #007bff;
             color: white;
-            padding: 10px;
         }
 
-        .table td {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-            text-align: center;
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            text-decoration: none;
         }
+    </style>
+</head>
+<body>
+    <div class="header">
+        Super Admin Panel
+        <a href="/Account/Logout" class="btn btn-danger logout-btn">Logout</a>
+    </div>
 
-    .btn-delete {
-        background: #dc3545;
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 5px;
-        text-decoration: none;
-    }
-
-        .btn-delete:hover {
-            background: #c82333;
-        }
-
-    .footer {
-        margin-top: 30px;
-    }
-</style>
-
-<div class="header">
-    Super Admin Panel
-    <a href="/Account/Logout" class="logout-btn">Logout</a>
-</div>
-
-<div class="container">
-    <h2 class="page-title">Manage Roles</h2>
-    <div class="table-container">
-        <table class="table">
+    <div class="container">
+        <h2 class="text-primary text-center">Manage Roles</h2>
+        <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>Role Name</th>
@@ -110,15 +76,16 @@
                     <tr>
                         <td>@role.Name</td>
                         <td>
-                            <a href="/SuperAdmin/DeleteRole?id=@role.Id" class="btn-delete">Delete Role</a>
+                            <a href="/SuperAdmin/DeleteRole?id=@role.Id" class="btn btn-danger">Delete</a>
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
-</div>
 
-<div class="footer">
-    &copy; 2025 SmartStock - Super Admin Panel
-</div>
+    <div class="footer">
+        &copy; 2025 SmartStock - Super Admin Panel
+    </div>
+</body>
+</html>

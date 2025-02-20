@@ -1,106 +1,78 @@
-﻿@{
+﻿### manageusers.cshtml
+
+@{
     ViewData["Title"] = "Manage Users";
 }
 
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #f4f4f4;
-        margin: 0;
-        padding: 0;
-    }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
 
-    .header, .footer {
-        background: #007bff;
-        color: white;
-        padding: 15px;
-        text-align: center;
-        font-size: 18px;
-        position: relative;
-    }
+        .container {
+            max-width: 1000px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
 
-    .logout-btn {
-        position: absolute;
-        right: 20px;
-        top: 15px;
-    }
+        .header, .footer {
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 18px;
+        }
 
-    .container {
-        max-width: 1000px;
-        margin: 50px auto;
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    }
+        .table th {
+            background: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        Super Admin Panel
+        <a href="/Account/Logout" class="btn btn-danger">Logout</a>
+    </div>
 
-    .title {
-        color: #007bff;
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .table th {
-        background: #007bff;
-        color: white;
-    }
-
-    .btn-action {
-        padding: 5px 10px;
-        font-size: 14px;
-    }
-
-    .footer {
-        margin-top: 20px;
-    }
-
-    @@media (max-width: 768px) {
-        .container
-
-    {
-        width: 90%;
-    }
-
-    }
-</style>
-
-<div class="header">
-    Super Admin Panel
-    <a href="/Account/Logout" class="btn btn-danger logout-btn">Logout</a>
-</div>
-
-<div class="container">
-    <h2 class="title">Manage Users</h2>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in Model)
-            {
+    <div class="container">
+        <h2 class="text-primary text-center">Manage Users</h2>
+        <table class="table table-bordered">
+            <thead>
                 <tr>
-                    <td>@user.Email</td>
-                    <td>@user.Role</td>
-                    <td>
-                        @if (user.Role == "User")
-                        {
-                            <a href="/SuperAdmin/PromoteUser?id=@user.Id" class="btn btn-success btn-action">Promote to Admin</a>
-                        }
-                        else if (user.Role == "Admin")
-                        {
-                            <a href="/SuperAdmin/DemoteUser?id=@user.Id" class="btn btn-warning btn-action">Demote to User</a>
-                        }
-                    </td>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-</div>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>@user.Email</td>
+                        <td>@user.Role</td>
+                        <td>
+                            <a href="/SuperAdmin/PromoteUser?id=@user.Id" class="btn btn-success">Promote</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 
-<div class="footer">
-    &copy; 2025 SmartStock - Super Admin Panel
-</div>
+    <div class="footer">
+        &copy; 2025 SmartStock - Super Admin Panel
+    </div>
+</body>
+</html>
