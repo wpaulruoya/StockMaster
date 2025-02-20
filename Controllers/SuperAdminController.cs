@@ -47,59 +47,59 @@ namespace StockMaster.Controllers
         }
 
         // ✅ Promote User to Admin
-        public async Task<IActionResult> PromoteUser(string id)
+        [HttpPost]
+        public async Task<IActionResult> PromoteUser([FromBody] UserActionRequest request)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _userManager.FindByIdAsync(request.UserId);
             if (user == null)
             {
-                TempData["Error"] = "User not found.";
-                return RedirectToAction("ManageUsers");
+                return Json(new { success = false, message = "User not found." });
             }
 
             if (await _userManager.IsInRoleAsync(user, "Admin"))
             {
-                TempData["Warning"] = "User is already an Admin.";
-                return RedirectToAction("ManageUsers");
+                return Json(new { success = false, message = "User is already an Admin." });
             }
 
             await _userManager.AddToRoleAsync(user, "Admin");
-            TempData["Success"] = "User has been promoted to Admin successfully.";
-            return RedirectToAction("ManageUsers");
+            return Json(new { success = true, message = "User has been promoted to Admin successfully." });
         }
 
-        // ✅ Demote Admin to User
-        public async Task<IActionResult> DemoteUser(string id)
+        [HttpPost]
+        public async Task<IActionResult> DemoteUser([FromBody] UserActionRequest request)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _userManager.FindByIdAsync(request.UserId);
             if (user == null)
             {
-                TempData["Error"] = "User not found.";
-                return RedirectToAction("ManageUsers");
+                return Json(new { success = false, message = "User not found." });
             }
 
             if (!await _userManager.IsInRoleAsync(user, "Admin"))
             {
-                TempData["Warning"] = "User is not an Admin.";
-                return RedirectToAction("ManageUsers");
+                return Json(new { success = false, message = "User is not an Admin." });
             }
 
             await _userManager.RemoveFromRoleAsync(user, "Admin");
-            TempData["Success"] = "User has been demoted to a regular User.";
-            return RedirectToAction("ManageUsers");
+            return Json(new { success = true, message = "User has been demoted to a regular User." });
         }
-        // ✅ Delete User
-        public async Task<IActionResult> DeleteUser(string id)
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteUser([FromBody] UserActionRequest request)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _userManager.FindByIdAsync(request.UserId);
             if (user == null)
             {
-                TempData["Error"] = "User not found.";
-                return RedirectToAction("ManageUsers");
+                return Json(new { success = false, message = "User not found." });
             }
 
             await _userManager.DeleteAsync(user);
-            TempData["Success"] = "User has been deleted successfully.";
-            return RedirectToAction("ManageUsers");
+            return Json(new { success = true, message = "User has been deleted successfully." });
+        }
+
+        // Create a model for handling user actions
+        public class UserActionRequest
+        {
+            public string UserId { get; set; }
         }
 
 
@@ -141,5 +141,30 @@ namespace StockMaster.Controllers
             TempData["Success"] = "Inventory item deleted successfully.";
             return RedirectToAction("ManageInventory");
         }
+        // In SuperAdminController.cs
+
+        // ✅ Change User Password
+        public async Task<IActionResult> ChangeUserPassword(string id, string newPassword)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return Json(new { success = false, message = "User not found." });
+            }
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+
+            if (result.Succeeded)
+            {
+                return Json(new { success = true, message = "Password updated successfully." });
+            }
+            else
+            {
+                return Json(new { success = false, message = "Error updating password." });
+            }
+        }
+
     }
+
 }
