@@ -87,6 +87,21 @@ namespace StockMaster.Controllers
             TempData["Success"] = "User has been demoted to a regular User.";
             return RedirectToAction("ManageUsers");
         }
+        // ✅ Delete User
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                TempData["Error"] = "User not found.";
+                return RedirectToAction("ManageUsers");
+            }
+
+            await _userManager.DeleteAsync(user);
+            TempData["Success"] = "User has been deleted successfully.";
+            return RedirectToAction("ManageUsers");
+        }
+
 
         // ✅ Manage Inventory (Fixed)
         public async Task<IActionResult> ManageInventory()
