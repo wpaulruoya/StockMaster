@@ -3,51 +3,122 @@
 }
 
 <style>
-    .roles-container {
-        max-width: 600px;
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 1000px;
         margin: 50px auto;
-        background: #f1f1f1;
         padding: 20px;
+        background: white;
         border-radius: 10px;
         box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    .roles-title {
-        color: #dc3545;
+    .header, .footer {
+        background: #007bff;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        font-size: 18px;
+        position: relative;
+    }
+
+    .logout-btn {
+        position: absolute;
+        right: 20px;
+        top: 15px;
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 5px;
+        text-decoration: none;
+    }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+    .page-title {
+        color: #007bff;
         text-align: center;
         margin-bottom: 20px;
     }
 
-    .table th {
-        background: #28a745;
-        color: white;
+    .table-container {
+        overflow-x: auto;
     }
 
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .table th {
+            background: #007bff;
+            color: white;
+            padding: 10px;
+        }
+
+        .table td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
     .btn-delete {
+        background: #dc3545;
+        color: white;
+        border: none;
         padding: 5px 10px;
-        font-size: 14px;
+        border-radius: 5px;
+        text-decoration: none;
+    }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+    .footer {
+        margin-top: 30px;
     }
 </style>
 
-<div class="roles-container">
-    <h2 class="roles-title">Manage Roles</h2>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Role Name</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var role in Model)
-            {
+<div class="header">
+    Super Admin Panel
+    <a href="/Account/Logout" class="logout-btn">Logout</a>
+</div>
+
+<div class="container">
+    <h2 class="page-title">Manage Roles</h2>
+    <div class="table-container">
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@role.Name</td>
-                    <td>
-                        <a href="/SuperAdmin/DeleteRole?id=@role.Id" class="btn btn-danger btn-delete">Delete Role</a>
-                    </td>
+                    <th>Role Name</th>
+                    <th>Actions</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var role in Model)
+                {
+                    <tr>
+                        <td>@role.Name</td>
+                        <td>
+                            <a href="/SuperAdmin/DeleteRole?id=@role.Id" class="btn-delete">Delete Role</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="footer">
+    &copy; 2025 SmartStock - Super Admin Panel
 </div>

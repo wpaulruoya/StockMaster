@@ -3,17 +3,39 @@
 }
 
 <style>
-    .users-container {
-        max-width: 800px;
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+
+    .header, .footer {
+        background: #007bff;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        font-size: 18px;
+        position: relative;
+    }
+
+    .logout-btn {
+        position: absolute;
+        right: 20px;
+        top: 15px;
+    }
+
+    .container {
+        max-width: 1000px;
         margin: 50px auto;
-        background: #ffffff;
+        background: white;
         padding: 20px;
         border-radius: 10px;
         box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    .users-title {
-        color: #17a2b8;
+    .title {
+        color: #007bff;
         text-align: center;
         margin-bottom: 20px;
     }
@@ -27,10 +49,28 @@
         padding: 5px 10px;
         font-size: 14px;
     }
+
+    .footer {
+        margin-top: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .container
+
+    {
+        width: 90%;
+    }
+
+    }
 </style>
 
-<div class="users-container">
-    <h2 class="users-title">Manage Users</h2>
+<div class="header">
+    Super Admin Panel
+    <a href="/Account/Logout" class="btn btn-danger logout-btn">Logout</a>
+</div>
+
+<div class="container">
+    <h2 class="title">Manage Users</h2>
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -59,4 +99,8 @@
             }
         </tbody>
     </table>
+</div>
+
+<div class="footer">
+    &copy; 2025 SmartStock - Super Admin Panel
 </div>
