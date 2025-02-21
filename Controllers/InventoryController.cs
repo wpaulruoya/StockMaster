@@ -24,6 +24,11 @@ namespace StockMaster.Controllers
         // ✅ View all inventory items for the logged-in user
         public async Task<IActionResult> Index()
         {
+            // Prevent browser from caching the page
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "0";
+
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Login", "User");
 
@@ -37,6 +42,11 @@ namespace StockMaster.Controllers
         // ✅ Show Add Inventory Form with pre-filled UserId
         public async Task<IActionResult> Add()
         {
+            // Prevent browser from caching the page
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "0";
+
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Login", "User");
 
@@ -76,6 +86,12 @@ namespace StockMaster.Controllers
         // ✅ Show Edit Inventory Form
         public async Task<IActionResult> Edit(int id)
         {
+
+            // Prevent browser from caching the page
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "0";
+
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Login", "User");
 
@@ -125,6 +141,12 @@ namespace StockMaster.Controllers
         // ✅ Show Delete Confirmation Page
         public async Task<IActionResult> Delete(int id)
         {
+
+            // Prevent browser from caching the page
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "0";
+
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Login", "User");
 

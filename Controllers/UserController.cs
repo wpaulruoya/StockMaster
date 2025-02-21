@@ -81,10 +81,13 @@ namespace StockMaster.Controllers
         }
 
         [HttpPost]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-            HttpContext.Session.Clear();
+            await _signInManager.SignOutAsync(); // Ensure user is signed out from Identity
+            HttpContext.Session.Clear(); // Clear the session
+            Response.Cookies.Delete(".AspNetCore.Identity.Application"); // Delete auth cookie
             return RedirectToAction("Index", "Home");
         }
+
     }
 }
