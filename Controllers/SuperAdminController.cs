@@ -41,13 +41,22 @@ namespace StockMaster.Controllers
 
             var userCount = totalUsers - adminCount;
 
+            // ✅ Fetch the last 5 registered users (assuming IdentityUser has a CreatedAt field)
+            var recentUsers = await _userManager.Users
+                .OrderByDescending(u => u.Id) // If CreatedAt is not available, use Id as a fallback
+                .Take(5)
+                .Select(u => new { u.UserName, u.Email })
+                .ToListAsync();
+
             ViewBag.TotalUsers = totalUsers;
             ViewBag.TotalInventory = totalInventory;
             ViewBag.AdminCount = adminCount;
             ViewBag.UserCount = userCount;
+            ViewBag.RecentUsers = recentUsers;
 
             return View();
         }
+
 
 
         // ✅ Manage Users
