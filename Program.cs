@@ -49,6 +49,9 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+// ✅ Add Response Caching to Fix Back Navigation Issue
+builder.Services.AddResponseCaching();
+
 // ✅ Add Swagger (for API documentation)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -76,6 +79,15 @@ app.UseSession();
 // ✅ Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
+
+// ✅ Prevent Back Navigation After Logout
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+    context.Response.Headers["Pragma"] = "no-cache";
+    context.Response.Headers["Expires"] = "-1";
+    await next();
+});
 
 // ✅ Enable Swagger in Development Mode
 if (app.Environment.IsDevelopment())
@@ -148,5 +160,4 @@ async Task CreateRolesAndSuperAdmin(IServiceProvider serviceProvider)
         await userManager.RemovePasswordAsync(superAdmin);
         await userManager.AddPasswordAsync(superAdmin, adminPassword);
     }
-
 }
