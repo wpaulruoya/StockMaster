@@ -9,5 +9,7 @@
         public decimal Price { get; set; }
         public string UserId { get; set; }
         public string UserEmail { get; set; } // ✅ Store user's email
+        public List<Inventory> Items { get; set; }
+
     }
 }
