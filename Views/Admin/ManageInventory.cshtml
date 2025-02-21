@@ -1,5 +1,112 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    Layout = null;
 }
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Inventory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gray-100">
+    <!-- Navbar -->
+    <nav class="bg-blue-600 text-white p-4 flex justify-between items-center">
+        <h1 class="text-xl font-semibold">Manage Inventory</h1>
+        <div class="flex space-x-4">
+            <a href="/Admin/Dashboard" class="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">Dashboard</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto p-6">
+        <!-- Feedback Messages -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="bg-green-500 text-white p-3 rounded mb-4">
+                @TempData["Success"]
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="bg-red-500 text-white p-3 rounded mb-4">
+                @TempData["Error"]
+            </div>
+        }
+
+        <!-- Filter by User -->
+        <div class="mb-4">
+            <label for="userFilter" class="block text-sm font-medium text-gray-700">Filter by User:</label>
+            <select id="userFilter" class="mt-1 p-2 w-full border rounded" onchange="filterInventory()">
+                <option value="all">All Users</option>
+                @foreach (var user in ViewBag.Users)
+                {
+                    <option value="@user.Id">@user.Email</option>
+                }
+            </select>
+        </div>
+
+        <!-- Inventory Cards -->
+        <div id="inventoryGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach (var item in ViewBag.Inventory)
+            {
+                <div class="bg-white p-4 shadow-md rounded inventory-card" data-user="@item.UserId">
+                    <h2 class="text-lg font-semibold">@item.Name</h2>
+                    <p class="text-sm text-gray-600">Owned by: @item.UserEmail</p>
+                    <p class="text-sm">Quantity: <strong>@item.Quantity</strong></p>
+                    <p class="text-sm">Price: <strong>$@item.Price</strong></p>
+                    <div class="mt-3 flex space-x-2">
+                        <a href="/Admin/EditInventory/@item.Id" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-700">Edit</a>
+                        <button onclick="deleteInventory('@item.Id')" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700">Delete</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <script>
+        function filterInventory() {
+            let selectedUser = document.getElementById("userFilter").value;
+            let cards = document.querySelectorAll(".inventory-card");
+
+            cards.forEach(card => {
+                if (selectedUser === "all" || card.dataset.user === selectedUser) {
+                    card.style.display = "block";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+
+        function deleteInventory(itemId) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You are about to delete this inventory item. This action cannot be undone!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, delete!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/Admin/DeleteInventory', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ItemId: itemId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire("Deleted!", data.message, "success").then(() => location.reload());
+                        } else {
+                            Swal.fire("Error!", data.message, "error");
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>

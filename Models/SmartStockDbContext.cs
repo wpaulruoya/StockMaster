@@ -13,6 +13,7 @@ namespace StockMaster.Models
         // ✅ Add Inventory Table
         public DbSet<Inventory> Inventories { get; set; }
 
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
