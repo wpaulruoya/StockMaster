@@ -1,6 +1,4 @@
-﻿@model List<StockMaster.Models.InventoryViewModel>
-
-@{
+﻿@{
     Layout = null;
 }
 
@@ -76,12 +74,26 @@
             transition: margin-left 0.3s ease-in-out;
         }
 
-        .dashboard-header {
+        .inventory-header {
             background: #3498db;
             padding: 20px;
             color: white;
             text-align: center;
             border-radius: 10px;
+        }
+
+        .inventory-container {
+            margin-top: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            flex: 1;
+            margin: 10px;
         }
 
         .collapsed {
@@ -92,42 +104,18 @@
                 left: 10px;
             }
 
-        .container {
-            width: 90%;
-            margin: 20px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-            .table th, .table td {
-                border: 1px solid #ddd;
-                padding: 10px;
-                text-align: left;
+        @@media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-250px);
             }
 
-            .table th {
-                background: #3498db;
-                color: white;
+            .toggle-btn {
+                left: 10px;
             }
 
-        .btn {
-            padding: 8px 12px;
-            text-decoration: none;
-            border-radius: 5px;
-            display: inline-block;
-        }
-
-        .btn-danger {
-            background: #e74c3c;
-            color: white;
+            .content {
+                margin-left: 0;
+            }
         }
     </style>
 </head>
@@ -145,36 +133,70 @@
             </li>
         </ul>
     </div>
-    <div class="content">
-        <div class="dashboard-header">
+
+    <div class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <div class="content" id="content">
+        <div class="inventory-header">
             <h1>Manage Inventory</h1>
         </div>
-        <div class="container">
-            <h2>Inventory Items</h2>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                        <th>Owner</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>@item.Name</td>
-                            <td>@item.Description</td>
-                            <td>@item.Quantity</td>
-                            <td>@item.Price</td>
-                            <td>@item.UserEmail</td>
+
+        <div class="inventory-container">
+            <div class="card">
+                <h3>Inventory List</h3>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <thead>
+                        <tr style="background-color: #f2f2f2;">
+                            <th style="padding: 10px; border-bottom: 2px solid #ddd;">Item Name</th>
+                            <th style="padding: 10px; border-bottom: 2px solid #ddd;">Quantity</th>
+                            <th style="padding: 10px; border-bottom: 2px solid #ddd;">Price</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.GroupedInventoryItems != null && ViewBag.GroupedInventoryItems.Count > 0)
+                        {
+                            @foreach (var group in ViewBag.GroupedInventoryItems)
+                            {
+                                <tr style="background-color: #d1ecf1;">
+                                    <td colspan="4" style="text-align: center; font-weight: bold; padding: 10px;">
+                                        Inventory for @group.UserEmail
+                                    </td>
+                                </tr>
+
+                                @foreach (var item in group.Items)
+                                {
+                                    <tr>
+                                        <td style="padding: 10px; text-align: center; border-bottom: 1px solid #ddd;">@item.Name</td>
+                                        <td style="padding: 10px; text-align: center; border-bottom: 1px solid #ddd;">@item.Quantity</td>
+                                        <td style="padding: 10px; text-align: center; border-bottom: 1px solid #ddd;">$@item.Price</td>
+                                        
+                                    </tr>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 10px;">No inventory items found.</td>
+                            </tr>
+                        }
+                    </tbody>
+
+
+                </table>
+            </div>
         </div>
     </div>
+
+    <script>
+        function toggleSidebar() {
+            let sidebar = document.getElementById("sidebar");
+            let content = document.getElementById("content");
+            sidebar.classList.toggle("collapsed");
+            content.style.marginLeft = sidebar.classList.contains("collapsed") ? "0" : "250px";
+        }
+    </script>
 </body>
 </html>

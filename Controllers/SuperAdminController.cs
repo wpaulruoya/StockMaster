@@ -137,15 +137,46 @@ namespace StockMaster.Controllers
 
 
         // ✅ Manage Inventory (Fixed)
-        public async Task<IActionResult> ManageInventory()
+        public IActionResult ManageInventory()
         {
-            var inventoryList = await _context.Inventories.ToListAsync();
-            var userIds = inventoryList.Select(i => i.UserId).Distinct().ToList();
-            var users = await _userManager.Users
-                                          .Where(u => userIds.Contains(u.Id))
-                                          .ToDictionaryAsync(u => u.Id, u => u.Email);
+            var inventories = _context.Inventories.ToList();
+            var users = _context.Users.ToList(); // Get users separately
 
-            var inventoryViewModel = inventoryList.Select(i => new InventoryViewModel
+            var groupedInventories = inventories
+                .GroupBy(i => i.UserId)
+                .Select(g => new
+                {
+                    UserEmail = users.FirstOrDefault(u => u.Id == g.Key)?.Email ?? "Unknown User",
+                    Items = g.ToList()
+                })
+                .ToList();
+
+            ViewBag.GroupedInventoryItems = groupedInventories;
+
+            return View();
+        }
+
+
+
+
+
+
+        public async Task<IActionResult> ViewUserInventory(string email)
+        {
+            // Find the user by email
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                TempData["Error"] = "User not found.";
+                return RedirectToAction("ManageInventory");
+            }
+
+            // Get inventory items for this user
+            var userInventory = await _context.Inventories
+                                              .Where(i => i.UserId == user.Id)
+                                              .ToListAsync();
+
+            var inventoryViewModel = userInventory.Select(i => new InventoryViewModel
             {
                 Id = i.Id,
                 Name = i.Name,
@@ -153,11 +184,12 @@ namespace StockMaster.Controllers
                 Quantity = i.Quantity,
                 Price = i.Price,
                 UserId = i.UserId,
-                UserEmail = users.ContainsKey(i.UserId) ? users[i.UserId] : "Unknown"
+                UserEmail = email
             }).ToList();
 
-            return View(inventoryViewModel);
+            return View("UserInventory", inventoryViewModel); // Redirects to a new view
         }
+
 
         // ✅ Delete Inventory Item
         public async Task<IActionResult> DeleteInventory(int id)
