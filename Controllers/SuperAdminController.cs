@@ -167,28 +167,32 @@ namespace StockMaster.Controllers
         }
         // In SuperAdminController.cs
 
-        // ✅ Change User Password
-        public async Task<IActionResult> ChangeUserPassword(string id, string newPassword)
+        // Change User Password
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _userManager.FindByIdAsync(request.UserId);
             if (user == null)
             {
                 return Json(new { success = false, message = "User not found." });
             }
 
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, resetToken, request.NewPassword);
 
             if (result.Succeeded)
             {
-                return Json(new { success = true, message = "Password updated successfully." });
+                return Json(new { success = true, message = "Password changed successfully." });
             }
-            else
-            {
-                return Json(new { success = false, message = "Error updating password." });
-            }
+
+            return Json(new { success = false, message = "Error changing password." });
         }
 
+        public class ChangePasswordRequest
+        {
+            public string UserId { get; set; }
+            public string NewPassword { get; set; }
+        }
     }
 
 }

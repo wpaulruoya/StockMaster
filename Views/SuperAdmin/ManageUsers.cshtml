@@ -185,7 +185,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     <script>
-               function confirmPromote(userId, email) {
+        function confirmPromote(userId, email) {
             Swal.fire({
                 title: "Promote User?",
                 text: `Are you sure you want to promote ${email} to Admin?`,
@@ -200,10 +200,11 @@
                         contentType: "application/json",
                         data: JSON.stringify({ userId: userId }),
                         success: function(response) {
-                            Swal.fire("Success!", response.message, "success").then(() => location.reload());
+                            toastr.success(response.message);
+                            setTimeout(() => location.reload(), 1500);
                         },
                         error: function(xhr) {
-                            Swal.fire("Error!", "Something went wrong. Please try again.", "error");
+                            toastr.error("Error: Unable to promote user.");
                         }
                     });
                 }
@@ -225,10 +226,11 @@
                         contentType: "application/json",
                         data: JSON.stringify({ userId: userId }),
                         success: function(response) {
-                            Swal.fire("Success!", response.message, "success").then(() => location.reload());
+                            toastr.success(response.message);
+                            setTimeout(() => location.reload(), 1500);
                         },
                         error: function(xhr) {
-                            Swal.fire("Error!", "Something went wrong. Please try again.", "error");
+                            toastr.error("Error: Unable to demote user.");
                         }
                     });
                 }
@@ -250,10 +252,49 @@
                         contentType: "application/json",
                         data: JSON.stringify({ userId: userId }),
                         success: function(response) {
-                            Swal.fire("Deleted!", response.message, "success").then(() => location.reload());
+                            toastr.success(response.message);
+                            setTimeout(() => location.reload(), 1500);
                         },
                         error: function(xhr) {
-                            Swal.fire("Error!", "Something went wrong. Please try again.", "error");
+                            toastr.error("Error: Unable to delete user.");
+                        }
+                    });
+                }
+            });
+        }
+                function changePassword(userId, email) {
+            Swal.fire({
+                title: "Change Password",
+                html: `
+                    <input type="password" id="newPassword" class="swal2-input" placeholder="Enter new password">
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: "Change Password",
+                preConfirm: () => {
+                    const newPassword = document.getElementById('newPassword').value;
+                    if (!newPassword) {
+                        Swal.showValidationMessage("Password cannot be empty");
+                        return false;
+                    }
+                    return { newPassword };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/SuperAdmin/ChangePassword",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({ userId: userId, newPassword: result.value.newPassword }),
+                        success: function (response) {
+                            if (response.success) {
+                                toastr.success(response.message);
+                            } else {
+                                toastr.error(response.message);
+                            }
+                        },
+                        error: function () {
+                            toastr.error("Error changing password.");
                         }
                     });
                 }
@@ -261,6 +302,7 @@
         }
 
     </script>
+
 
 
 </body>
