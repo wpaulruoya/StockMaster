@@ -262,22 +262,30 @@
                 }
             });
         }
-                function changePassword(userId, email) {
+                   function changePassword(userId, email) {
             Swal.fire({
-                title: "Change Password",
+                title: `Change Password for ${email}`,
                 html: `
-                    <input type="password" id="newPassword" class="swal2-input" placeholder="Enter new password">
+                    <input type="password" id="newPassword" class="swal2-input" placeholder="New Password">
+                    <input type="password" id="confirmPassword" class="swal2-input" placeholder="Confirm Password">
                 `,
-                focusConfirm: false,
                 showCancelButton: true,
                 confirmButtonText: "Change Password",
                 preConfirm: () => {
-                    const newPassword = document.getElementById('newPassword').value;
-                    if (!newPassword) {
-                        Swal.showValidationMessage("Password cannot be empty");
+                    const newPassword = document.getElementById("newPassword").value;
+                    const confirmPassword = document.getElementById("confirmPassword").value;
+
+                    if (!newPassword || !confirmPassword) {
+                        Swal.showValidationMessage("Please fill in both fields.");
                         return false;
                     }
-                    return { newPassword };
+
+                    if (newPassword !== confirmPassword) {
+                        Swal.showValidationMessage("Passwords do not match.");
+                        return false;
+                    }
+
+                    return { newPassword, confirmPassword };
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -285,15 +293,19 @@
                         url: "/SuperAdmin/ChangePassword",
                         type: "POST",
                         contentType: "application/json",
-                        data: JSON.stringify({ userId: userId, newPassword: result.value.newPassword }),
-                        success: function (response) {
+                        data: JSON.stringify({
+                            userId: userId,
+                            newPassword: result.value.newPassword,
+                            confirmPassword: result.value.confirmPassword
+                        }),
+                        success: function(response) {
                             if (response.success) {
                                 toastr.success(response.message);
                             } else {
                                 toastr.error(response.message);
                             }
                         },
-                        error: function () {
+                        error: function() {
                             toastr.error("Error changing password.");
                         }
                     });

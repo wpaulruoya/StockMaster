@@ -169,8 +169,14 @@ namespace StockMaster.Controllers
 
         // Change User Password
         [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
         {
+            if (request.NewPassword != request.NewPassword)
+            {
+                return Json(new { success = false, message = "Passwords do not match." });
+            }
+
             var user = await _userManager.FindByIdAsync(request.UserId);
             if (user == null)
             {
@@ -184,9 +190,12 @@ namespace StockMaster.Controllers
             {
                 return Json(new { success = true, message = "Password changed successfully." });
             }
-
-            return Json(new { success = false, message = "Error changing password." });
+            else
+            {
+                return Json(new { success = false, message = "Error changing password." });
+            }
         }
+
 
         public class ChangePasswordRequest
         {
