@@ -41,13 +41,22 @@ namespace StockMaster.Controllers
 
             var userCount = totalUsers - adminCount;
 
+            // ✅ Fetch the last 5 registered users (assuming IdentityUser has a CreatedAt field)
+            var recentUsers = await _userManager.Users
+                .OrderByDescending(u => u.Id) // If CreatedAt is not available, use Id as a fallback
+                .Take(5)
+                .Select(u => new { u.UserName, u.Email })
+                .ToListAsync();
+
             ViewBag.TotalUsers = totalUsers;
             ViewBag.TotalInventory = totalInventory;
             ViewBag.AdminCount = adminCount;
             ViewBag.UserCount = userCount;
+            ViewBag.RecentUsers = recentUsers;
 
             return View();
         }
+
 
 
         // ✅ Manage Users
@@ -169,8 +178,14 @@ namespace StockMaster.Controllers
 
         // Change User Password
         [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
         {
+            if (request.NewPassword != request.NewPassword)
+            {
+                return Json(new { success = false, message = "Passwords do not match." });
+            }
+
             var user = await _userManager.FindByIdAsync(request.UserId);
             if (user == null)
             {
@@ -184,9 +199,12 @@ namespace StockMaster.Controllers
             {
                 return Json(new { success = true, message = "Password changed successfully." });
             }
-
-            return Json(new { success = false, message = "Error changing password." });
+            else
+            {
+                return Json(new { success = false, message = "Error changing password." });
+            }
         }
+
 
         public class ChangePasswordRequest
         {
