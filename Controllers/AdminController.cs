@@ -5,10 +5,11 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 
 namespace StockMaster.Controllers
 {
-    [Authorize(Roles = "Admin")] // Ensures only Admins can access this controller
+    [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
         private readonly UserManager<IdentityUser> _userManager;
@@ -20,14 +21,22 @@ namespace StockMaster.Controllers
             _roleManager = roleManager;
         }
 
+        private void PreventPageCaching()
+        {
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "0";
+        }
+
         public async Task<IActionResult> Dashboard()
         {
+            PreventPageCaching();
+
             var recentUsers = await _userManager.Users.OrderByDescending(u => u.Id).Take(5).ToListAsync();
-            ViewBag.RecentUsers = recentUsers; // ✅ Ensure ViewBag.RecentUsers is always set
+            ViewBag.RecentUsers = recentUsers;
 
             return View();
         }
-
 
         public async Task<IActionResult> ManageUsers()
         {
@@ -44,7 +53,9 @@ namespace StockMaster.Controllers
                     }
                 }
 
-                return View(filteredUsers);
+                ViewBag.Users = filteredUsers; // ✅ Make sure ViewBag.Users is always set
+
+                return View();
             }
             catch (Exception ex)
             {
@@ -54,9 +65,17 @@ namespace StockMaster.Controllers
             }
         }
 
+
         public IActionResult ManageInventory()
         {
+            PreventPageCaching();
             return View();
+        }
+
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear(); // Clears session data
+            return RedirectToAction("Index", "Home"); // Redirects to the login page
         }
     }
 }

@@ -1,6 +1,12 @@
-﻿@{
+﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@{
     Layout = null;
+    HttpContextAccessor.HttpContext.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+    HttpContextAccessor.HttpContext.Response.Headers["Pragma"] = "no-cache";
+    HttpContextAccessor.HttpContext.Response.Headers["Expires"] = "0";
 }
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -11,15 +17,20 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
-    <!-- Navbar -->
+
+    <!-- Admin Navbar -->
     <nav class="bg-blue-600 text-white p-4 flex justify-between items-center">
-        <h1 class="text-xl font-semibold">Admin Dashboard</h1>
+        <h1 class="text-xl font-semibold">Admin Panel</h1>
+        <ul class="flex space-x-4">
+            <li><a href="/Admin/Dashboard" class="hover:underline">Dashboard</a></li>
+            <li><a href="/Admin/ManageUsers" class="hover:underline">Manage Users</a></li>
+            <li><a href="/Admin/ManageInventory" class="hover:underline">Manage Inventory</a></li>
+        </ul>
         <a href="/Admin/Logout" class="bg-red-500 px-4 py-2 rounded hover:bg-red-700">Logout</a>
     </nav>
 
     <!-- Main Content -->
     <div class="container mx-auto p-6">
-        <!-- Feedback Messages -->
         @if (TempData["Success"] != null)
         {
             <div class="bg-green-500 text-white p-3 rounded mb-4">
@@ -34,19 +45,14 @@
         }
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Total Users -->
             <div class="bg-white p-6 rounded shadow-md text-center">
                 <h2 class="text-xl font-semibold">Total Users</h2>
                 <p class="text-2xl font-bold text-blue-600">@ViewBag.TotalUsers</p>
             </div>
-
-            <!-- Total Inventory -->
             <div class="bg-white p-6 rounded shadow-md text-center">
                 <h2 class="text-xl font-semibold">Total Inventory</h2>
                 <p class="text-2xl font-bold text-green-600">@ViewBag.TotalInventory</p>
             </div>
-
-            <!-- Total Admins -->
             <div class="bg-white p-6 rounded shadow-md text-center">
                 <h2 class="text-xl font-semibold">Total Admins</h2>
                 <p class="text-2xl font-bold text-purple-600">@ViewBag.AdminCount</p>
@@ -86,5 +92,6 @@
             </table>
         </div>
     </div>
+
 </body>
 </html>
