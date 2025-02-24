@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using StockMaster.Models;
+using static StockMaster.Controllers.SuperAdminController;
 
 namespace StockMaster.Controllers
 {
@@ -131,6 +132,85 @@ namespace StockMaster.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<JsonResult> EditInventory([FromBody] Inventory model)
+        {
+            if (model == null || model.Id == 0)
+            {
+                return Json(new { success = false, message = "Invalid request." });
+            }
+
+            var inventoryItem = await _context.Inventories.FindAsync(model.Id);
+            if (inventoryItem == null)
+            {
+                return Json(new { success = false, message = "Inventory item not found." });
+            }
+
+            inventoryItem.Name = model.Name;
+            inventoryItem.Quantity = model.Quantity;
+            inventoryItem.Price = model.Price;
+
+            _context.Inventories.Update(inventoryItem);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Inventory updated successfully." });
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken] // ✅ Ensures request security
+        public async Task<JsonResult> DeleteUser([FromBody] UserActionRequest request)
+        {
+            if (request == null || string.IsNullOrEmpty(request.UserId))
+            {
+                return Json(new { success = false, message = "Invalid request." });
+            }
+
+            var user = await _userManager.FindByIdAsync(request.UserId);
+            if (user == null)
+            {
+                return Json(new { success = false, message = "User not found." });
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            if (currentUser.Id == user.Id)
+            {
+                return Json(new { success = false, message = "You cannot delete your own account." });
+            }
+
+            if (roles.Contains("SuperAdmin"))
+            {
+                return Json(new { success = false, message = "You cannot delete a SuperAdmin." });
+            }
+
+            // ✅ Allow Admins to delete other Admins
+            var currentUserRoles = await _userManager.GetRolesAsync(currentUser);
+            if (roles.Contains("Admin") && !currentUserRoles.Contains("SuperAdmin"))
+            {
+                return Json(new { success = false, message = "Only a SuperAdmin can delete an Admin." });
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+            if (result.Succeeded)
+            {
+                return Json(new { success = true, message = "User deleted successfully." });
+            }
+            else
+            {
+                return Json(new { success = false, message = "Error deleting user. Please try again." });
+            }
+        }
+
+
+
+
+
+        public class UserActionRequest
+        {
+            public string UserId { get; set; }
+        }
 
 
         public IActionResult Logout()

@@ -98,7 +98,10 @@
                 if (result.isConfirmed) {
                     fetch('/Admin/DeleteUser', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector("[name=__RequestVerificationToken]").value
+                        },
                         body: JSON.stringify({ UserId: userId })
                     })
                     .then(response => response.json())
@@ -108,6 +111,10 @@
                         } else {
                             Swal.fire("Error!", data.message, "error");
                         }
+                    })
+                    .catch(error => {
+                        Swal.fire("Error!", "Something went wrong. Please try again.", "error");
+                        console.error("Fetch error:", error);
                     });
                 }
             });
@@ -117,6 +124,45 @@
         document.getElementById("menu-toggle").addEventListener("click", function () {
             document.getElementById("menu").classList.toggle("hidden");
         });
+
+       function deleteUser(userId) {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You are about to delete this user. This action is irreversible!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch('/Admin/DeleteUser', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector("[name=__RequestVerificationToken]").value
+                },
+                body: JSON.stringify({ UserId: userId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire("Deleted!", data.message, "success").then(() => location.reload());
+                } else {
+                    Swal.fire("Error!", data.message, "error");
+                }
+            })
+            .catch(error => {
+                Swal.fire("Error!", "Something went wrong. Please try again.", "error");
+                console.error("Fetch error:", error);
+            });
+        }
+    });
+}
+
+
+}
+
     </script>
 </body>
 </html>
