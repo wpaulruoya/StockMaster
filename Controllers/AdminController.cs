@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using StockMaster.Models;
 using static StockMaster.Controllers.SuperAdminController;
+using Microsoft.AspNetCore.Authentication;
 
 namespace StockMaster.Controllers
 {
@@ -155,6 +156,33 @@ namespace StockMaster.Controllers
 
             return Json(new { success = true, message = "Inventory updated successfully." });
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken] // ✅ Ensures request security
+        public async Task<JsonResult> DeleteInventory([FromBody] InventoryDeleteRequest request)
+        {
+            if (request == null || request.Id == 0)
+            {
+                return Json(new { success = false, message = "Invalid request." });
+            }
+
+            var inventoryItem = await _context.Inventories.FindAsync(request.Id);
+            if (inventoryItem == null)
+            {
+                return Json(new { success = false, message = "Inventory item not found." });
+            }
+
+            _context.Inventories.Remove(inventoryItem);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Inventory deleted successfully." });
+        }
+
+        // Define a request model for deletion
+        public class InventoryDeleteRequest
+        {
+            public int Id { get; set; }
+        }
+
 
 
         [HttpPost]
@@ -213,11 +241,12 @@ namespace StockMaster.Controllers
         }
 
 
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-            HttpContext.Session.Clear(); // Clears session data
-            return RedirectToAction("Index", "Home"); // Redirects to the login page
+            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+            return RedirectToAction("Index", "Home");
         }
+
     }
 
     public class UserWithRoleViewModel
