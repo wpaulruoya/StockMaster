@@ -14,8 +14,13 @@
 <body class="bg-gray-100">
     <!-- Navbar -->
     <nav class="bg-blue-600 text-white p-4 flex justify-between items-center">
-        <h1 class="text-xl font-semibold">Manage Users</h1>
-        <a href="/Admin/Dashboard" class="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">Back to Dashboard</a>
+        <h1 class="text-xl font-semibold">Admin Panel</h1>
+        <ul class="flex space-x-4">
+            <li><a href="/Admin/Dashboard" class="hover:underline">Dashboard</a></li>
+            <li><a href="/Admin/ManageUsers" class="hover:underline">Manage Users</a></li>
+            <li><a href="/Admin/ManageInventory" class="hover:underline">Manage Inventory</a></li>
+        </ul>
+        <a href="/Admin/Logout" class="bg-red-500 px-4 py-2 rounded hover:bg-red-700">Logout</a>
     </nav>
 
     <!-- Main Content -->
