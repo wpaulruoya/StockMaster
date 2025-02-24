@@ -184,11 +184,12 @@ namespace StockMaster.Controllers
         }
 
 
-
         [HttpPost]
-        [ValidateAntiForgeryToken] // ✅ Ensures request security
+        [ValidateAntiForgeryToken]
         public async Task<JsonResult> DeleteUser([FromBody] UserActionRequest request)
         {
+            Console.WriteLine($"Delete request received for User ID: {request?.UserId}"); // ✅ Debugging
+
             if (request == null || string.IsNullOrEmpty(request.UserId))
             {
                 return Json(new { success = false, message = "Invalid request." });
@@ -208,16 +209,9 @@ namespace StockMaster.Controllers
                 return Json(new { success = false, message = "You cannot delete your own account." });
             }
 
-            if (roles.Contains("SuperAdmin"))
+            if (roles.Contains("Admin"))
             {
-                return Json(new { success = false, message = "You cannot delete a SuperAdmin." });
-            }
-
-            // ✅ Allow Admins to delete other Admins
-            var currentUserRoles = await _userManager.GetRolesAsync(currentUser);
-            if (roles.Contains("Admin") && !currentUserRoles.Contains("SuperAdmin"))
-            {
-                return Json(new { success = false, message = "Only a SuperAdmin can delete an Admin." });
+                return Json(new { success = false, message = "Admins cannot delete other Admins." });
             }
 
             var result = await _userManager.DeleteAsync(user);
@@ -230,6 +224,8 @@ namespace StockMaster.Controllers
                 return Json(new { success = false, message = "Error deleting user. Please try again." });
             }
         }
+
+
 
 
 
