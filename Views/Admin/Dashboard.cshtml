@@ -18,16 +18,26 @@
 <body class="bg-gray-100">
 
     <!-- 🔹 Navbar -->
+    <!-- 🔹 Navbar -->
     <nav class="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md">
         <h1 class="text-xl font-semibold">Admin Panel</h1>
-        <ul class="hidden md:flex space-x-6">
-            <li><a href="/Admin/Dashboard" class="hover:underline">Dashboard</a></li>
-            <li><a href="/Admin/ManageUsers" class="hover:underline">Manage Users</a></li>
-            <li><a href="/Admin/ManageInventory" class="hover:underline">Manage Inventory</a></li>
-            <a href="/Admin/Logout" class=" hover:underline">Logout</a>
 
+        <!-- 🔹 Mobile Menu Button -->
+        <button id="menu-toggle" class="md:hidden focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+            </svg>
+        </button>
+
+        <!-- 🔹 Navigation Links -->
+        <ul id="menu" class="hidden md:flex space-x-6 absolute md:static bg-blue-600 w-full md:w-auto left-0 top-16 md:top-0 p-4 md:p-0 shadow-md md:shadow-none">
+            <li><a href="/Admin/Dashboard" class="block py-2 md:py-0 hover:underline">Dashboard</a></li>
+            <li><a href="/Admin/ManageUsers" class="block py-2 md:py-0 hover:underline">Manage Users</a></li>
+            <li><a href="/Admin/ManageInventory" class="block py-2 md:py-0 hover:underline">Manage Inventory</a></li>
+            <li><a href="/Admin/Logout" class="block py-2 md:py-0 hover:underline">Logout</a></li>
         </ul>
     </nav>
+
 
     <!-- 🔹 Main Content -->
     <div class="container mx-auto p-6">
@@ -119,5 +129,12 @@
         </div>
     </div>
 
+
+    <!-- 🔹 JavaScript for Menu Toggle -->
+    <script>
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            document.getElementById('menu').classList.toggle('hidden');
+        });
+    </script>
 </body>
 </html>
