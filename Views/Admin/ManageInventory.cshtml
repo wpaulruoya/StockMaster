@@ -82,9 +82,9 @@
                 <div class="mt-3 flex space-x-2">
                     <button onclick="showEditForm('@item.Id', '@item.Name', '@item.Quantity', '@item.Price')" 
                             class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-700">Edit</button>
-                    <button onclick="deleteInventory('@item.Id')" 
-                            class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700">Delete</button>
-                </div>
+                        <button onclick="deleteInventory('@item.Id')" 
+            class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700">Delete</button>
+     </div>
 
                 <!-- Hidden Edit Form -->
                 <form id="editForm-@item.Id" class="hidden mt-4 bg-gray-100 p-4 rounded">
@@ -109,6 +109,9 @@
             </div>
             }
 </div>
+<form id="deleteForm">
+            @Html.AntiForgeryToken()
+</form>
 
     </div>
 
@@ -172,35 +175,45 @@ function submitEditForm(itemId) {
 }
 
 
+function deleteInventory(itemId) {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "This action cannot be undone!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // ✅ Get CSRF Token from hidden form
+            const token = document.querySelector("#deleteForm input[name='__RequestVerificationToken']").value;
 
-
-        function deleteInventory(itemId) {
-            Swal.fire({
-                title: "Are you sure?",
-                text: "You are about to delete this inventory item. This action cannot be undone!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#3085d6",
-                confirmButtonText: "Yes, delete!"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch('/Admin/DeleteInventory', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ ItemId: itemId })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire("Deleted!", data.message, "success").then(() => location.reload());
-                        } else {
-                            Swal.fire("Error!", data.message, "error");
-                        }
-                    });
+            fetch('/Admin/DeleteInventory', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token // ✅ Ensure CSRF Token is included
+                },
+                body: JSON.stringify({ Id: itemId }) // ✅ Send as an object
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire("Deleted!", data.message, "success").then(() => location.reload());
+                } else {
+                    Swal.fire("Error!", data.message, "error");
                 }
+            })
+            .catch(error => {
+                Swal.fire("Error!", "Something went wrong.", "error");
             });
         }
+    });
+}
+
+
+
     </script>
 
 </body>
