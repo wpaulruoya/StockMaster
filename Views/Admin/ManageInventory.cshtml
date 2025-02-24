@@ -72,18 +72,44 @@
         <div id="inventoryGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach (var item in ViewBag.Inventory)
             {
-                <div class="bg-white p-4 shadow-md rounded inventory-card" data-user="@item.UserId">
-                    <h2 class="text-lg font-semibold">@item.Name</h2>
-                    <p class="text-sm text-gray-600">Owned by: @item.UserEmail</p>
-                    <p class="text-sm">Quantity: <strong>@item.Quantity</strong></p>
-                    <p class="text-sm">Price: <strong>$@item.Price</strong></p>
-                    <div class="mt-3 flex space-x-2">
-                        <a href="/Admin/EditInventory/@item.Id" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-700">Edit</a>
-                        <button onclick="deleteInventory('@item.Id')" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700">Delete</button>
-                    </div>
+            <div class="bg-white p-4 shadow-md rounded inventory-card" data-user="@item.UserId">
+                <h2 class="text-lg font-semibold">@item.Name</h2>
+                <p class="text-sm text-gray-600">Owned by: @item.UserEmail</p>
+                <p class="text-sm">Quantity: <strong>@item.Quantity</strong></p>
+                <p class="text-sm">Price: <strong>$@item.Price</strong></p>
+
+                <!-- Buttons -->
+                <div class="mt-3 flex space-x-2">
+                    <button onclick="showEditForm('@item.Id', '@item.Name', '@item.Quantity', '@item.Price')" 
+                            class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-700">Edit</button>
+                    <button onclick="deleteInventory('@item.Id')" 
+                            class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700">Delete</button>
                 </div>
+
+                <!-- Hidden Edit Form -->
+                <form id="editForm-@item.Id" class="hidden mt-4 bg-gray-100 p-4 rounded">
+                    <input type="hidden" id="editItemId-@item.Id" value="@item.Id" />
+
+                    <label class="block text-sm font-medium text-gray-700">Item Name</label>
+                    <input type="text" id="editName-@item.Id" value="@item.Name" class="mt-1 p-2 w-full border rounded" required />
+
+                    <label class="block text-sm font-medium text-gray-700 mt-3">Quantity</label>
+                    <input type="number" id="editQuantity-@item.Id" value="@item.Quantity" class="mt-1 p-2 w-full border rounded" required />
+
+                    <label class="block text-sm font-medium text-gray-700 mt-3">Price</label>
+                    <input type="number" step="0.01" id="editPrice-@item.Id" value="@item.Price" class="mt-1 p-2 w-full border rounded" required />
+
+                    <div class="mt-3 flex space-x-2">
+                        <button type="button" onclick="submitEditForm('@item.Id')" 
+                                class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-700">Save</button>
+                        <button type="button" onclick="hideEditForm('@item.Id')" 
+                                class="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-700">Cancel</button>
+                    </div>
+                </form>
+            </div>
             }
-        </div>
+</div>
+
     </div>
 
     <script>
@@ -99,6 +125,54 @@
                 }
             });
         }
+
+        function showEditForm(itemId, name, quantity, price) {
+    document.getElementById(`editForm-${itemId}`).classList.remove("hidden");
+}
+
+function hideEditForm(itemId) {
+    document.getElementById(`editForm-${itemId}`).classList.add("hidden");
+}
+
+function submitEditForm(itemId) {
+    let updatedName = document.getElementById(`editName-${itemId}`).value;
+    let updatedQuantity = document.getElementById(`editQuantity-${itemId}`).value;
+    let updatedPrice = document.getElementById(`editPrice-${itemId}`).value;
+
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You are about to update this inventory item.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, update!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch('/Admin/EditInventory', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    Id: itemId,
+                    Name: updatedName,
+                    Quantity: updatedQuantity,
+                    Price: updatedPrice
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire("Updated!", data.message, "success").then(() => location.reload());
+                } else {
+                    Swal.fire("Error!", data.message, "error");
+                }
+            });
+        }
+    });
+}
+
+
+
 
         function deleteInventory(itemId) {
             Swal.fire({
