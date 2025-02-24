@@ -24,17 +24,9 @@
             <li><a href="/Admin/Dashboard" class="hover:underline">Dashboard</a></li>
             <li><a href="/Admin/ManageUsers" class="hover:underline">Manage Users</a></li>
             <li><a href="/Admin/ManageInventory" class="hover:underline">Manage Inventory</a></li>
+            <a href="/Admin/Logout" class=" hover:underline">Logout</a>
+
         </ul>
-        <div class="relative group">
-            <button class="bg-gray-800 text-white px-4 py-2 rounded-md flex items-center">
-                <span class="mr-2">Admin</span>
-                ▼
-            </button>
-            <div class="absolute hidden group-hover:block right-0 bg-white text-gray-700 w-40 mt-2 rounded-md shadow-md">
-                <a href="#" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
-                <a href="/Admin/Logout" class="block px-4 py-2 hover:bg-gray-100">Logout</a>
-            </div>
-        </div>
     </nav>
 
     <!-- 🔹 Main Content -->
@@ -99,7 +91,6 @@
             <table class="w-full bg-white shadow-md rounded">
                 <thead class="bg-blue-600 text-white">
                     <tr>
-                        <th class="py-3 px-4 text-left">Avatar</th>
                         <th class="py-3 px-4 text-left">Username</th>
                         <th class="py-3 px-4 text-left">Email</th>
                     </tr>
@@ -110,9 +101,6 @@
                         @foreach (var user in ViewBag.RecentUsers)
                         {
                             <tr class="border-b hover:bg-gray-100 transition">
-                                <td class="py-3 px-4">
-                                    <img src="https://via.placeholder.com/40" class="rounded-full">
-                                </td>
                                 <td class="py-3 px-4">@user.UserName</td>
                                 <td class="py-3 px-4">@user.Email</td>
                             </tr>
