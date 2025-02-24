@@ -7,7 +7,6 @@
     HttpContextAccessor.HttpContext.Response.Headers["Expires"] = "0";
 }
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,19 +17,30 @@
 </head>
 <body class="bg-gray-100">
 
-    <!-- Admin Navbar -->
-    <nav class="bg-blue-600 text-white p-4 flex justify-between items-center">
+    <!-- 🔹 Navbar -->
+    <nav class="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md">
         <h1 class="text-xl font-semibold">Admin Panel</h1>
-        <ul class="flex space-x-4">
+        <ul class="hidden md:flex space-x-6">
             <li><a href="/Admin/Dashboard" class="hover:underline">Dashboard</a></li>
             <li><a href="/Admin/ManageUsers" class="hover:underline">Manage Users</a></li>
             <li><a href="/Admin/ManageInventory" class="hover:underline">Manage Inventory</a></li>
         </ul>
-        <a href="/Admin/Logout" class="bg-red-500 px-4 py-2 rounded hover:bg-red-700">Logout</a>
+        <div class="relative group">
+            <button class="bg-gray-800 text-white px-4 py-2 rounded-md flex items-center">
+                <span class="mr-2">Admin</span>
+                ▼
+            </button>
+            <div class="absolute hidden group-hover:block right-0 bg-white text-gray-700 w-40 mt-2 rounded-md shadow-md">
+                <a href="#" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
+                <a href="/Admin/Logout" class="block px-4 py-2 hover:bg-gray-100">Logout</a>
+            </div>
+        </div>
     </nav>
 
-    <!-- Main Content -->
+    <!-- 🔹 Main Content -->
     <div class="container mx-auto p-6">
+
+        <!-- ✅ Success & Error Messages -->
         @if (TempData["Success"] != null)
         {
             <div class="bg-green-500 text-white p-3 rounded mb-4">
@@ -44,29 +54,54 @@
             </div>
         }
 
+        <!-- 🔹 Dashboard Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white p-6 rounded shadow-md text-center">
-                <h2 class="text-xl font-semibold">Total Users</h2>
-                <p class="text-2xl font-bold text-blue-600">@ViewBag.TotalUsers</p>
+            <div class="bg-white p-6 rounded-lg shadow-lg flex items-center">
+                <div class="bg-blue-600 text-white p-4 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 2a6 6 0 100 12 6 6 0 000-12zM2 16a8 8 0 1116 0H2z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-lg font-semibold">Total Users</h2>
+                    <p class="text-2xl font-bold text-blue-600">@(ViewBag.TotalUsers ?? 0)</p>
+                </div>
             </div>
-            <div class="bg-white p-6 rounded shadow-md text-center">
-                <h2 class="text-xl font-semibold">Total Inventory</h2>
-                <p class="text-2xl font-bold text-green-600">@ViewBag.TotalInventory</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg flex items-center">
+                <div class="bg-green-600 text-white p-4 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 2a6 6 0 100 12 6 6 0 000-12zM2 16a8 8 0 1116 0H2z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-lg font-semibold">Total Inventory</h2>
+                    <p class="text-2xl font-bold text-green-600">@(ViewBag.TotalInventory ?? 0)</p>
+                </div>
             </div>
-            <div class="bg-white p-6 rounded shadow-md text-center">
-                <h2 class="text-xl font-semibold">Total Admins</h2>
-                <p class="text-2xl font-bold text-purple-600">@ViewBag.AdminCount</p>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg flex items-center">
+                <div class="bg-purple-600 text-white p-4 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 2a6 6 0 100 12 6 6 0 000-12zM2 16a8 8 0 1116 0H2z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-lg font-semibold">Total Admins</h2>
+                    <p class="text-2xl font-bold text-purple-600">@(ViewBag.AdminCount ?? 0)</p>
+                </div>
             </div>
         </div>
 
-        <!-- Recent Users -->
+        <!-- 🔹 Recent Users -->
         <div class="mt-8">
             <h2 class="text-lg font-semibold mb-4">Recent Users</h2>
             <table class="w-full bg-white shadow-md rounded">
                 <thead class="bg-blue-600 text-white">
                     <tr>
-                        <th class="py-2 px-4">Username</th>
-                        <th class="py-2 px-4">Email</th>
+                        <th class="py-3 px-4 text-left">Avatar</th>
+                        <th class="py-3 px-4 text-left">Username</th>
+                        <th class="py-3 px-4 text-left">Email</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -74,16 +109,19 @@
                     {
                         @foreach (var user in ViewBag.RecentUsers)
                         {
-                            <tr class="border-b">
-                                <td class="py-2 px-4">@user.UserName</td>
-                                <td class="py-2 px-4">@user.Email</td>
+                            <tr class="border-b hover:bg-gray-100 transition">
+                                <td class="py-3 px-4">
+                                    <img src="https://via.placeholder.com/40" class="rounded-full">
+                                </td>
+                                <td class="py-3 px-4">@user.UserName</td>
+                                <td class="py-3 px-4">@user.Email</td>
                             </tr>
                         }
                     }
                     else
                     {
                         <tr>
-                            <td colspan="2" class="py-2 px-4 text-center text-gray-500">
+                            <td colspan="3" class="py-4 px-4 text-center text-gray-500">
                                 No recent users available.
                             </td>
                         </tr>
