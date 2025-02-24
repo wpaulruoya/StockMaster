@@ -60,7 +60,13 @@ namespace StockMaster.Controllers
                     }
                 }
 
-                ViewBag.Users = userList; // ✅ Pass user list with roles to the view
+                // ✅ Sort: Admins first, then Normal Users (based on role)
+                userList = userList
+                    .OrderByDescending(u => u.Role == "Admin") // Admins appear first
+                    .ThenBy(u => u.Email) // Sort alphabetically within role groups
+                    .ToList();
+
+                ViewBag.Users = userList;
                 return View();
             }
             catch (Exception ex)
@@ -70,6 +76,7 @@ namespace StockMaster.Controllers
                 return View("Error");
             }
         }
+
 
         public IActionResult ManageInventory()
         {
