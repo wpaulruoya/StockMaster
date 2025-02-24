@@ -12,15 +12,24 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-gray-100">
-    <!-- Navbar -->
-    <nav class="bg-blue-600 text-white p-4 flex justify-between items-center">
+    <!-- 🔹 Navbar -->
+    <nav class="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md">
         <h1 class="text-xl font-semibold">Admin Panel</h1>
-        <ul class="flex space-x-4">
+
+        <!-- Mobile Menu Button -->
+        <button id="menu-btn" class="md:hidden focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+            </svg>
+        </button>
+
+        <!-- Navbar Links -->
+        <ul id="menu" class="hidden md:flex space-x-6 absolute md:relative top-12 left-0 w-full md:w-auto bg-blue-600 md:bg-transparent p-4 md:p-0 shadow-md md:shadow-none">
             <li><a href="/Admin/Dashboard" class="hover:underline">Dashboard</a></li>
             <li><a href="/Admin/ManageUsers" class="hover:underline">Manage Users</a></li>
             <li><a href="/Admin/ManageInventory" class="hover:underline">Manage Inventory</a></li>
+            <li><a href="/Admin/Logout" class="hover:underline bg-red-500 px-4 py-1 rounded">Logout</a></li>
         </ul>
-        <a href="/Admin/Logout" class="bg-red-500 px-4 py-2 rounded hover:bg-red-700">Logout</a>
     </nav>
 
     <!-- Main Content -->
@@ -70,6 +79,12 @@
     </div>
 
     <script>
+            <!-- 🔹 JavaScript for Menu Toggle -->
+
+             document.getElementById("menu-btn").addEventListener("click", function() {
+            document.getElementById("menu").classList.toggle("hidden");
+        });
+
         function filterInventory() {
             let selectedUser = document.getElementById("userFilter").value;
             let cards = document.querySelectorAll(".inventory-card");
