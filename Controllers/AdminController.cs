@@ -34,10 +34,33 @@ namespace StockMaster.Controllers
         public async Task<IActionResult> Dashboard()
         {
             PreventPageCaching();
-            var recentUsers = await _userManager.Users.OrderByDescending(u => u.Id).Take(5).ToListAsync();
+
+            // Count Total Users (Excluding Super Admin)
+            var allUsers = await _userManager.Users.ToListAsync();
+            var totalUsers = allUsers.Count(u => !_userManager.GetRolesAsync(u).Result.Contains("SuperAdmin"));
+
+            // Count Total Admins
+            var totalAdmins = allUsers.Count(u => _userManager.GetRolesAsync(u).Result.Contains("Admin"));
+
+            // Count Total Inventory Items
+            var totalInventory = await _context.Inventories.CountAsync();
+
+            // Fetch Recent Users (excluding SuperAdmin)
+            var recentUsers = allUsers
+                .Where(u => !_userManager.GetRolesAsync(u).Result.Contains("SuperAdmin"))
+                .OrderByDescending(u => u.Id)
+                .Take(5)
+                .ToList();
+
+            // Pass data to ViewBag
+            ViewBag.TotalUsers = totalUsers;
+            ViewBag.AdminCount = totalAdmins;
+            ViewBag.TotalInventory = totalInventory;
             ViewBag.RecentUsers = recentUsers;
+
             return View();
         }
+
 
         public async Task<IActionResult> ManageUsers()
         {
