@@ -25,112 +25,47 @@
 
     <!-- Main Content -->
     <div class="container mx-auto p-6">
-        <!-- Feedback Messages -->
-        @if (TempData["Success"] != null)
-        {
-            <div class="bg-green-500 text-white p-3 rounded mb-4">
-                @TempData["Success"]
-            </div>
-        }
-        @if (TempData["Error"] != null)
-        {
-            <div class="bg-red-500 text-white p-3 rounded mb-4">
-                @TempData["Error"]
-            </div>
-        }
-
         <h2 class="text-lg font-semibold mb-4">User List</h2>
 
-        <!-- Check if ViewBag.Users is null or empty -->
-        @if (ViewBag.Users != null && ViewBag.Users.Count > 0)
-        {
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @foreach (var user in ViewBag.Users)
-                {
-                    if (user.Role != "SuperAdmin") // Exclude SuperAdmin
+        <!-- Table -->
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <table class="w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="border border-gray-300 p-2 text-left">Email</th>
+                        <th class="border border-gray-300 p-2 text-left">Role</th>
+                        <th class="border border-gray-300 p-2 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ViewBag.Users != null && ViewBag.Users.Count > 0)
                     {
-                        <div class="bg-white p-4 rounded-lg shadow-md">
-                            <h3 class="text-lg font-semibold">@user.Email</h3>
-                            <p class="text-gray-600">Role: <span class="font-semibold">@user.Role</span></p>
-                            <div class="mt-3 flex gap-2">
-                                @if (user.Role == "User")
-                                {
-                                    <button onclick="promoteUser('@user.Id')" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-700">Promote</button>
-                                }
-                                else if (user.Role == "Admin")
-                                {
-                                    <button onclick="demoteUser('@user.Id')" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-700">Demote</button>
-                                }
-                                <button onclick="deleteUser('@user.Id')" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700">Delete</button>
-                            </div>
-                        </div>
+                        @foreach (var user in ViewBag.Users)
+                        {
+                            if (user.Role != "SuperAdmin") // Exclude SuperAdmin
+                            {
+                                <tr class="border border-gray-300">
+                                    <td class="border border-gray-300 p-2">@user.Email</td>
+                                    <td class="border border-gray-300 p-2">@user.Role</td>
+                                    <td class="border border-gray-300 p-2 text-center">
+                                        <button onclick="deleteUser('@user.Id')" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700">Delete</button>
+                                    </td>
+                                </tr>
+                            }
+                        }
                     }
-                }
-            </div>
-        }
-        else
-        {
-            <p class="text-gray-500 text-center">No users found.</p>
-        }
+                    else
+                    {
+                        <tr>
+                            <td colspan="3" class="text-center p-4 text-gray-500">No users found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-        function promoteUser(userId) {
-            Swal.fire({
-                title: "Are you sure?",
-                text: "You are about to promote this user to Admin.",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes, promote!"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch('/Admin/PromoteUser', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ UserId: userId })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire("Success!", data.message, "success").then(() => location.reload());
-                        } else {
-                            Swal.fire("Error!", data.message, "error");
-                        }
-                    });
-                }
-            });
-        }
-
-        function demoteUser(userId) {
-            Swal.fire({
-                title: "Are you sure?",
-                text: "You are about to demote this Admin to a regular User.",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes, demote!"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch('/Admin/DemoteUser', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ UserId: userId })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire("Success!", data.message, "success").then(() => location.reload());
-                        } else {
-                            Swal.fire("Error!", data.message, "error");
-                        }
-                    });
-                }
-            });
-        }
-
         function deleteUser(userId) {
             Swal.fire({
                 title: "Are you sure?",
