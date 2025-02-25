@@ -64,7 +64,7 @@
                                         </span>
                                     </td>
                                     <td class="p-3 text-center">
-                                        @if (user.Role != "Admin")
+                                        @if (user.Role != "Admin") // ✅ Prevent Admin deletion in UI
                                         {
                                             <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded delete-user"
                                                     data-user-id="@user.Id">
@@ -72,6 +72,7 @@
                                             </button>
                                         }
                                     </td>
+
                                 </tr>
                             }
                         }
@@ -86,9 +87,10 @@
             </div>
         </div>
 
-        <form method="post">
+        <form id="csrf-form" method="post">
             @Html.AntiForgeryToken()
         </form>
+
 
     </div>
 
@@ -98,7 +100,7 @@
             document.getElementById('menu').classList.toggle('hidden');
         });
 
-        document.addEventListener("DOMContentLoaded", function () {
+                      document.addEventListener("DOMContentLoaded", function () {
             document.querySelectorAll(".delete-user").forEach(button => {
                 button.addEventListener("click", function () {
                     var userId = this.getAttribute("data-user-id");
@@ -113,13 +115,13 @@
                         confirmButtonText: "Yes, delete!"
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            const token = document.querySelector("[name=__RequestVerificationToken]").value;
+                            const token = document.querySelector("#csrf-form input[name='__RequestVerificationToken']").value;
 
                             fetch('/Admin/DeleteUser', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': token  // ✅ Fixed CSRF Token Header
+                                    'RequestVerificationToken': token  // ✅ Fix CSRF token usage
                                 },
                                 body: JSON.stringify({ UserId: userId })
                             })
