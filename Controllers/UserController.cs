@@ -62,7 +62,6 @@ namespace StockMaster.Controllers
         }
 
         [HttpPost]
-        [HttpPost]
         public async Task<IActionResult> Authenticate(string email, string password)
         {
             var user = await _userManager.FindByEmailAsync(email);
@@ -94,6 +93,57 @@ namespace StockMaster.Controllers
                 return RedirectToAction("Home", "Home");
             }
         }
+
+        [Authorize(Roles = "Admin, SuperAdmin")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // Prevent admins from deleting other admins or super admins
+            var roles = await _userManager.GetRolesAsync(user);
+
+            if (User.IsInRole("Admin") && (roles.Contains("Admin") || roles.Contains("SuperAdmin")))
+            {
+                TempData["ErrorMessage"] = "Admins can only delete normal users.";
+                return RedirectToAction("ManageUsers"); // Ensure this action exists
+            }
+
+            if (User.IsInRole("SuperAdmin") && roles.Contains("SuperAdmin"))
+            {
+                TempData["ErrorMessage"] = "SuperAdmins cannot delete other SuperAdmins.";
+                return RedirectToAction("ManageUsers");
+            }
+
+            // Prevent self-deletion
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser.Id == user.Id)
+            {
+                TempData["ErrorMessage"] = "You cannot delete your own account.";
+                return RedirectToAction("ManageUsers");
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+            if (result.Succeeded)
+            {
+                TempData["SuccessMessage"] = "User deleted successfully.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Failed to delete user.";
+            }
+
+            return RedirectToAction("ManageUsers");
+        }
+
 
 
         [HttpPost]

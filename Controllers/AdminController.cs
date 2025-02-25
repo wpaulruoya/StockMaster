@@ -185,33 +185,24 @@ namespace StockMaster.Controllers
 
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<JsonResult> DeleteUser([FromBody] UserActionRequest request)
+        [ValidateAntiForgeryToken] // ✅ Protects against CSRF attacks
+        public async Task<JsonResult> DeleteUser([FromBody] DeleteUserViewModel model)
         {
-            Console.WriteLine($"Delete request received for User ID: {request?.UserId}"); // ✅ Debugging
-
-            if (request == null || string.IsNullOrEmpty(request.UserId))
+            if (model == null || string.IsNullOrEmpty(model.UserId))
             {
-                return Json(new { success = false, message = "Invalid request." });
+                return Json(new { success = false, message = "Invalid user data." });
             }
 
-            var user = await _userManager.FindByIdAsync(request.UserId);
+            var user = await _userManager.FindByIdAsync(model.UserId);
             if (user == null)
             {
                 return Json(new { success = false, message = "User not found." });
             }
 
             var roles = await _userManager.GetRolesAsync(user);
-            var currentUser = await _userManager.GetUserAsync(User);
-
-            if (currentUser.Id == user.Id)
-            {
-                return Json(new { success = false, message = "You cannot delete your own account." });
-            }
-
             if (roles.Contains("Admin"))
             {
-                return Json(new { success = false, message = "Admins cannot delete other Admins." });
+                return Json(new { success = false, message = "Cannot delete Admin users." });
             }
 
             var result = await _userManager.DeleteAsync(user);
@@ -221,9 +212,17 @@ namespace StockMaster.Controllers
             }
             else
             {
-                return Json(new { success = false, message = "Error deleting user. Please try again." });
+                return Json(new { success = false, message = "Failed to delete user." });
             }
         }
+
+        // ViewModel for user deletion
+        public class DeleteUserViewModel
+        {
+            public string UserId { get; set; }
+        }
+
+
 
 
 
