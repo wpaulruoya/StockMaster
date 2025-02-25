@@ -210,7 +210,6 @@ namespace StockMaster.Controllers
 
         // Change User Password
         [HttpPost]
-        [HttpPost]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
         {
             if (request.NewPassword != request.NewPassword)

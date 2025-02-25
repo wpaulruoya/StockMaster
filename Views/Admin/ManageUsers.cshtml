@@ -11,28 +11,34 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 </head>
 <body class="bg-gray-100">
-    <!-- 🔹 Navbar -->
+    <!-- 🔹 Navbar (Improved) -->
     <nav class="bg-blue-600 text-white p-4 flex justify-between items-center shadow-md">
         <h1 class="text-xl font-semibold">Admin Panel</h1>
 
-        <!-- 🔹 Mobile Menu Button -->
+        <!-- 🔹 Mobile Menu Button (Fixed) -->
         <button id="menu-toggle" class="md:hidden focus:outline-none">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
             </svg>
         </button>
 
-        <!-- 🔹 Navigation Links -->
-        <ul id="menu" class="hidden md:flex space-x-6 absolute md:static bg-blue-600 w-full md:w-auto left-0 top-16 md:top-0 p-4 md:p-0 shadow-md md:shadow-none">
+        <!-- 🔹 Navigation Links (Updated to match Dashboard) -->
+        <ul id="menu" class="hidden md:flex space-x-6 md:static md:bg-transparent absolute left-0 top-16 w-full bg-blue-600 md:w-auto p-4 md:p-0 shadow-md md:shadow-none">
             <li><a href="/Admin/Dashboard" class="block py-2 md:py-0 hover:underline">Dashboard</a></li>
             <li><a href="/Admin/ManageUsers" class="block py-2 md:py-0 hover:underline">Manage Users</a></li>
             <li><a href="/Admin/ManageInventory" class="block py-2 md:py-0 hover:underline">Manage Inventory</a></li>
             <li><a href="/Admin/Logout" class="block py-2 md:py-0 hover:underline">Logout</a></li>
         </ul>
     </nav>
+
+    <!-- 🔹 JavaScript for Navbar Toggle (Fixed) -->
+    <script>
+        document.getElementById("menu-toggle").addEventListener("click", function() {
+            document.getElementById("menu").classList.toggle("hidden");
+        });
+    </script>
 
     <!-- Main Content -->
     <div class="container mx-auto p-6">
@@ -59,16 +65,15 @@
                                 <tr class="border-b border-gray-300 hover:bg-gray-100 transition">
                                     <td class="p-3">@user.Email</td>
                                     <td class="p-3 hidden sm:table-cell">
-                                        <span class="px-2 py-1 rounded-md text-white
-                        @(user.Role == "Admin" ? "bg-green-500" : "bg-gray-500")">
+                                        <span class="px-2 py-1 rounded-md text-white @(user.Role == "Admin" ? "bg-green-500" : "bg-gray-500")">
                                             @user.Role
                                         </span>
                                     </td>
                                     <td class="p-3 text-center">
-                                        @if (user.Role != "Admin")  // 🔹 Hide the button for admins
+                                        @if (user.Role != "Admin")
                                         {
                                             <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded delete-user"
-                                                    onclick="deleteUser('@user.Id')">
+                                                    data-user-id="@user.Id">
                                                 Delete
                                             </button>
                                         }
@@ -83,10 +88,10 @@
                             </tr>
                         }
                     </tbody>
-
                 </table>
             </div>
         </div>
+
         <form method="post">
             @Html.AntiForgeryToken()
         </form>
@@ -94,79 +99,53 @@
     </div>
 
     <script>
-        
-
         // Mobile menu toggle
         document.getElementById("menu-toggle").addEventListener("click", function () {
             document.getElementById("menu").classList.toggle("hidden");
         });
-        function deleteUser(userId) {
-            Swal.fire({
-                title: "Are you sure?",
-                text: "You are about to delete this user. This action is irreversible!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#3085d6",
-                confirmButtonText: "Yes, delete!"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const token = document.querySelector("[name=__RequestVerificationToken]").value;
 
-                    fetch('/Admin/DeleteUser', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'RequestVerificationToken': token // 🔹 Added CSRF token
-                        },
-                        body: JSON.stringify({ UserId: userId })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire("Deleted!", data.message, "success").then(() => location.reload());
-                        } else {
-                            Swal.fire("Error!", data.message, "error");
-                        }
-                    })
-                    .catch(error => {
-                        Swal.fire("Error!", "Something went wrong. Please try again.", "error");
-                        console.error("Fetch error:", error);
-                    });
-                }
-            });
-        }
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".delete-user").forEach(button => {
+                button.addEventListener("click", function () {
+                    var userId = this.getAttribute("data-user-id");
 
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "You are about to delete this user. This action is irreversible!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#d33",
+                        cancelButtonColor: "#3085d6",
+                        confirmButtonText: "Yes, delete!"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const token = document.querySelector("[name=__RequestVerificationToken]").value;
 
-
-}
-
-        $(document).ready(function () {
-                $(".delete-user").click(function () {
-                    var userId = $(this).data("user-id");
-
-                    if (!confirm("Are you sure you want to delete this user?")) {
-                        return;
-                    }
-
-                    $.ajax({
-                        url: '/Admin/DeleteUser',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        headers: { 'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val() },
-                        data: JSON.stringify({ UserId: userId }),
-                        success: function (response) {
-                            alert(response.message);
-                            if (response.success) {
-                                location.reload(); // Refresh page after successful delete
-                            }
-                        },
-                        error: function () {
-                            alert("Error deleting user. Please try again.");
+                            fetch('/Admin/DeleteUser', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': token  // ✅ Fixed CSRF Token Header
+                                },
+                                body: JSON.stringify({ UserId: userId })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire("Deleted!", data.message, "success").then(() => location.reload());
+                                } else {
+                                    Swal.fire("Error!", data.message, "error");
+                                }
+                            })
+                            .catch(error => {
+                                Swal.fire("Error!", "Something went wrong. Please try again.", "error");
+                                console.error("Fetch error:", error);
+                            });
                         }
                     });
                 });
             });
+        });
     </script>
 </body>
 </html>
