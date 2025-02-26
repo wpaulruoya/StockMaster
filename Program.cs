@@ -2,14 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using StockMaster.Models;
 using Microsoft.OpenApi.Models;
+using StockMaster.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ✅ Load appsettings.json correctly
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 // ✅ Configure SmartStockDbContext
 builder.Services.AddDbContext<SmartStockDbContext>(options =>
@@ -27,20 +27,27 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
     .AddRoles<IdentityRole>() // ✅ Enable Roles
     .AddEntityFrameworkStores<SmartStockDbContext>();
 
-// ✅ Configure JWT Authentication
-var jwtKey = builder.Configuration["Jwt:Key"];
-var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+// ✅ Read JWT settings correctly with Debugging
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 
-if (string.IsNullOrEmpty(jwtKey))
+var jwtKey = jwtSettings["Key"];
+var jwtIssuer = jwtSettings["Issuer"];
+var jwtAudience = jwtSettings["Audience"];
+
+// ✅ Debug Log to Check if Values Are Loaded Correctly
+Console.WriteLine($"[DEBUG] JWT Key: {jwtKey}");
+Console.WriteLine($"[DEBUG] JWT Issuer: {jwtIssuer}");
+Console.WriteLine($"[DEBUG] JWT Audience: {jwtAudience}");
+
+if (string.IsNullOrEmpty(jwtKey) || string.IsNullOrEmpty(jwtIssuer) || string.IsNullOrEmpty(jwtAudience))
 {
-    throw new InvalidOperationException("JWT Secret Key is missing in appsettings.json");
+    throw new InvalidOperationException("JWT configuration is missing in appsettings.json");
 }
 
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
 {
@@ -53,11 +60,10 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidIssuer = jwtIssuer,
-        ValidAudience = jwtIssuer,
+        ValidAudience = jwtAudience,
         ClockSkew = TimeSpan.Zero
     };
 });
-
 
 // ✅ Add API Controllers and MVC Controllers separately
 builder.Services.AddControllers().AddJsonOptions(options =>
@@ -75,7 +81,7 @@ builder.Services.AddCors(options =>
                           .AllowAnyHeader());
 });
 
-// ✅ Add Sessions
+// ✅ Enable Sessions
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -84,10 +90,7 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// ✅ Add Response Caching to Fix Back Navigation Issue
-builder.Services.AddResponseCaching();
-
-// ✅ Add Swagger (for API documentation with JWT Support)
+// ✅ Add Swagger with JWT Support (Always Enabled)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -120,21 +123,16 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 // ✅ Middleware Pipeline
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
-
+app.UseExceptionHandler("/Home/Error");
+app.UseHsts();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
 
-// ✅ Enable CORS (Must be before authentication)
+// ✅ Enable CORS
 app.UseCors("AllowAll");
 
-// ✅ Enable Sessions (Must be before authentication)
+// ✅ Enable Sessions
 app.UseSession();
 
 // ✅ Authentication & Authorization
@@ -150,12 +148,9 @@ app.Use(async (context, next) =>
     await next();
 });
 
-// ✅ Enable Swagger in Development Mode
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// ✅ Enable Swagger in All Environments
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // ✅ Create Roles and Super Admin at Startup
 using (var scope = app.Services.CreateScope())
@@ -165,19 +160,12 @@ using (var scope = app.Services.CreateScope())
 }
 
 // ✅ Map API Controllers Correctly
-app.MapControllers(); // Ensures API controllers are handled properly
+app.MapControllers();
 
 // ✅ Map MVC Controllers
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-// ✅ Log registered routes
-var logger = app.Services.GetRequiredService<ILogger<Program>>();
-foreach (var endpoint in app.Services.GetRequiredService<Microsoft.AspNetCore.Routing.EndpointDataSource>().Endpoints)
-{
-    logger.LogInformation($"Registered Endpoint: {endpoint.DisplayName}");
-}
 
 // ✅ Start the app
 app.Run();
@@ -200,9 +188,9 @@ async Task CreateRolesAndSuperAdmin(IServiceProvider serviceProvider)
         }
     }
 
-    // ✅ Update Super Admin credentials
-    string adminEmail = "StockMaster@gmail.com";  // New Super Admin email
-    string adminPassword = "Admin@2025";         // Keep the same password
+    // ✅ Super Admin credentials
+    string adminEmail = "StockMaster@gmail.com";
+    string adminPassword = "Admin@2025";
 
     var superAdmin = await userManager.FindByEmailAsync(adminEmail);
     if (superAdmin == null)
