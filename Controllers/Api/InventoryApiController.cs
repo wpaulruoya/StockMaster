@@ -83,7 +83,9 @@ namespace StockMaster.Controllers.Api
                 new { success = true, message = "Inventory item added successfully.", inventory = inventoryItem });
         }
 
-        // ✅ UPDATE AN EXISTING INVENTORY ITEM
+        // ✅ Changing A NEW INVENTORY ITEM
+
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateInventory(int id, [FromBody] Inventory updatedInventory)
         {
@@ -99,16 +101,48 @@ namespace StockMaster.Controllers.Api
                 return NotFound(new { success = false, message = "Inventory item not found or not owned by user." });
             }
 
-            // ✅ Apply updates
-            inventoryItem.Name = updatedInventory.Name ?? inventoryItem.Name;
-            inventoryItem.Description = updatedInventory.Description ?? inventoryItem.Description;
-            inventoryItem.Quantity = updatedInventory.Quantity > 0 ? updatedInventory.Quantity : inventoryItem.Quantity;
-            inventoryItem.Price = updatedInventory.Price > 0 ? updatedInventory.Price : inventoryItem.Price;
+            // Store original values before update
+            var changes = new List<object>();
+
+            if (!string.IsNullOrEmpty(updatedInventory.Name) && updatedInventory.Name != inventoryItem.Name)
+            {
+                changes.Add(new { Field = "Name", OldValue = inventoryItem.Name, NewValue = updatedInventory.Name });
+                inventoryItem.Name = updatedInventory.Name;
+            }
+
+            if (!string.IsNullOrEmpty(updatedInventory.Description) && updatedInventory.Description != inventoryItem.Description)
+            {
+                changes.Add(new { Field = "Description", OldValue = inventoryItem.Description, NewValue = updatedInventory.Description });
+                inventoryItem.Description = updatedInventory.Description;
+            }
+
+            if (updatedInventory.Quantity > 0 && updatedInventory.Quantity != inventoryItem.Quantity)
+            {
+                changes.Add(new { Field = "Quantity", OldValue = inventoryItem.Quantity, NewValue = updatedInventory.Quantity });
+                inventoryItem.Quantity = updatedInventory.Quantity;
+            }
+
+            if (updatedInventory.Price > 0 && updatedInventory.Price != inventoryItem.Price)
+            {
+                changes.Add(new { Field = "Price", OldValue = inventoryItem.Price, NewValue = updatedInventory.Price });
+                inventoryItem.Price = updatedInventory.Price;
+            }
+
+            if (!changes.Any())
+            {
+                return Ok(new { success = false, message = "No changes detected.", inventory = inventoryItem });
+            }
 
             _context.Inventories.Update(inventoryItem);
             await _context.SaveChangesAsync();
 
-            return Ok(new { success = true, message = "Inventory item updated successfully.", inventory = inventoryItem });
+            return Ok(new
+            {
+                success = true,
+                message = "Inventory item updated successfully.",
+                changes = changes,
+                inventory = inventoryItem
+            });
         }
 
         // ✅ DELETE AN INVENTORY ITEM
@@ -127,10 +161,24 @@ namespace StockMaster.Controllers.Api
                 return NotFound(new { success = false, message = "Inventory item not found or not owned by user." });
             }
 
+            // Store item details before deletion
+            var deletedItemDetails = new
+            {
+                Id = inventoryItem.Id,
+                Name = inventoryItem.Name,
+                Description = inventoryItem.Description
+            };
+
             _context.Inventories.Remove(inventoryItem);
             await _context.SaveChangesAsync();
 
-            return Ok(new { success = true, message = "Inventory item deleted successfully.", deletedItemId = id });
+            return Ok(new
+            {
+                success = true,
+                message = "Inventory item deleted successfully.",
+                deletedItem = deletedItemDetails
+            });
         }
+
     }
 }
