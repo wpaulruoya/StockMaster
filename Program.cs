@@ -1,55 +1,49 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using StockMaster.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Load appsettings.json correctly
+// ✅ Load Configuration
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-// ✅ Configure SmartStockDbContext
+// ✅ Configure Database Context
 builder.Services.AddDbContext<SmartStockDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// ✅ Configure Identity with relaxed password rules
-builder.Services.AddDefaultIdentity<IdentityUser>(options =>
-{
-    options.Password.RequireDigit = false;
-    options.Password.RequireLowercase = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequiredLength = 6;
-})
-    .AddRoles<IdentityRole>() // ✅ Enable Roles
-    .AddEntityFrameworkStores<SmartStockDbContext>();
+// ✅ Configure Identity with Roles
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<SmartStockDbContext>()
+    .AddDefaultTokenProviders();
 
-// ✅ Read JWT settings correctly with Debugging
+// ✅ Read JWT settings
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-
 var jwtKey = jwtSettings["Key"];
 var jwtIssuer = jwtSettings["Issuer"];
 var jwtAudience = jwtSettings["Audience"];
-
-// ✅ Debug Log to Check if Values Are Loaded Correctly
-Console.WriteLine($"[DEBUG] JWT Key: {jwtKey}");
-Console.WriteLine($"[DEBUG] JWT Issuer: {jwtIssuer}");
-Console.WriteLine($"[DEBUG] JWT Audience: {jwtAudience}");
 
 if (string.IsNullOrEmpty(jwtKey) || string.IsNullOrEmpty(jwtIssuer) || string.IsNullOrEmpty(jwtAudience))
 {
     throw new InvalidOperationException("JWT configuration is missing in appsettings.json");
 }
 
+// ✅ Configure Hybrid Authentication (Cookies for MVC, JWT for API)
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme; // Default for MVC
 })
-.AddJwtBearer(options =>
+.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+{
+    options.LoginPath = "/Account/Login"; // Redirect to login for web users
+    options.AccessDeniedPath = "/Account/AccessDenied"; // Redirect if unauthorized
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+})
+.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
 {
     options.RequireHttpsMetadata = false;
     options.SaveToken = true;
@@ -65,20 +59,26 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// ✅ Add API Controllers and MVC Controllers separately
-builder.Services.AddControllers().AddJsonOptions(options =>
+// ✅ Allow API calls without Cookie authentication
+builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.JsonSerializerOptions.PropertyNamingPolicy = null; // Keep property names unchanged
+    options.Events.OnRedirectToLogin = context =>
+    {
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            context.Response.StatusCode = 401; // Prevents redirect loops in API calls
+            return Task.CompletedTask;
+        }
+        context.Response.Redirect(context.RedirectUri);
+        return Task.CompletedTask;
+    };
 });
-builder.Services.AddControllersWithViews();
 
-// ✅ Enable CORS (for API access from frontend applications)
+// ✅ Enable CORS for API
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
-        builder => builder.AllowAnyOrigin()
-                          .AllowAnyMethod()
-                          .AllowAnyHeader());
+        policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
 
 // ✅ Enable Sessions
@@ -90,35 +90,13 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// ✅ Add Swagger with JWT Support (Always Enabled)
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Enter 'Bearer {token}'"
-    });
+// ✅ Add Controllers and MVC Views
+builder.Services.AddControllersWithViews();
+builder.Services.AddControllers();
 
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[] {}
-        }
-    });
-});
+// ✅ Configure API Authentication for Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -129,15 +107,15 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-// ✅ Enable CORS
-app.UseCors("AllowAll");
-
 // ✅ Enable Sessions
 app.UseSession();
 
-// ✅ Authentication & Authorization
+// ✅ Enable Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
+
+// ✅ Enable CORS
+app.UseCors("AllowAll");
 
 // ✅ Prevent Back Navigation After Logout
 app.Use(async (context, next) =>
@@ -148,31 +126,30 @@ app.Use(async (context, next) =>
     await next();
 });
 
-// ✅ Enable Swagger in All Environments
+// ✅ Swagger Setup
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// ✅ Create Roles and Super Admin at Startup
+// ✅ Seed Super Admin and Roles
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     await CreateRolesAndSuperAdmin(services);
 }
 
-// ✅ Map API Controllers Correctly
+// ✅ Map Controllers
 app.MapControllers();
 
-// ✅ Map MVC Controllers
+// ✅ Map MVC Routes
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// ✅ Start the app
 app.Run();
 
-// =======================================================
-// ✅ Function to Create Roles & Super Admin at Startup
-// =======================================================
+// ===============================================
+// ✅ Function to Create Roles & Super Admin
+// ===============================================
 async Task CreateRolesAndSuperAdmin(IServiceProvider serviceProvider)
 {
     var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -205,7 +182,6 @@ async Task CreateRolesAndSuperAdmin(IServiceProvider serviceProvider)
     }
     else
     {
-        // ✅ Reset password for Super Admin
         await userManager.RemovePasswordAsync(superAdmin);
         await userManager.AddPasswordAsync(superAdmin, adminPassword);
     }
