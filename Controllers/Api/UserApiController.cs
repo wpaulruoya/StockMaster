@@ -50,7 +50,7 @@ namespace StockMaster.Controllers.Api
                     // ✅ Assign 'User' role by default
                     await _userManager.AddToRoleAsync(user, "User");
 
-                    return Ok(new { Message = "User registered successfully." });
+                    return Ok(new { Message = $"New user with the email: {model.Email} has been successfully registered." });
                 }
                 return BadRequest(new { Message = "Registration failed.", Errors = result.Errors.Select(e => e.Description) });
             }
@@ -59,6 +59,7 @@ namespace StockMaster.Controllers.Api
                 return StatusCode(500, new { Message = "An error occurred during registration.", Error = ex.Message });
             }
         }
+
 
         // ✅ LOGIN USER & RETURN JWT
         [HttpPost("login")]
