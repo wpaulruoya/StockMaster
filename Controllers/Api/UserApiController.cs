@@ -97,8 +97,17 @@ namespace StockMaster.Controllers.Api
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null) return NotFound(new { Message = "User not found." });
 
-            return Ok(new { Email = user.Email, UserName = user.UserName });
+            // ✅ Fetch user roles
+            var roles = await _userManager.GetRolesAsync(user);
+
+            return Ok(new
+            {
+                Email = user.Email,
+                UserName = user.UserName,
+                Role = roles.FirstOrDefault() ?? "User" // ✅ Default to 'User' if no role is assigned
+            });
         }
+
 
         // ✅ GET TOTAL NUMBER OF USERS (Protected)
         [HttpGet("count")]
