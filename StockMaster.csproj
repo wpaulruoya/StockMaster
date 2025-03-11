@@ -23,4 +23,11 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Application Layer\" />
+    <Folder Include="Infrastructure Layer\" />
+    <Folder Include="Presentation Layer\" />
+    <Folder Include="Domain Layer\" />
+  </ItemGroup>
+
 </Project>
