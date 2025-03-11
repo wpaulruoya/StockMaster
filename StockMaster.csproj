@@ -27,4 +27,10 @@
     <Folder Include="Application Layer\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Presentation Layer\appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

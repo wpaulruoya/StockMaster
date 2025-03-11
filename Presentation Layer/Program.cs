@@ -9,7 +9,8 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // ✅ Load Configuration
-builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+builder.Configuration.SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "Presentation Layer"))
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 // ✅ Configure Database Context
 builder.Services.AddDbContext<SmartStockDbContext>(options =>
