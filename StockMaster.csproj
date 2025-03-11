@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Infrastructure Layer\Data\" />
+    <Folder Include="Application Layer\" />
   </ItemGroup>
 
 </Project>
