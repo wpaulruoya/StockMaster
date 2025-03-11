@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Application Layer\" />
+    <Folder Include="Application Layer\NewFolder\" />
   </ItemGroup>
 
   <ItemGroup>
