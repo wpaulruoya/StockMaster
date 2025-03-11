@@ -27,7 +27,6 @@
     <Folder Include="Application Layer\" />
     <Folder Include="Domain Layer\Entities\" />
     <Folder Include="Infrastructure Layer\Data\" />
-    <Folder Include="Presentation Layer\" />
   </ItemGroup>
 
 </Project>
