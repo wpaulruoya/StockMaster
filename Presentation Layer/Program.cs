@@ -92,7 +92,13 @@ builder.Services.AddSession(options =>
 });
 
 // ✅ Add Controllers and MVC Views
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddRazorOptions(options =>
+    {
+        options.ViewLocationFormats.Clear();
+        options.ViewLocationFormats.Add("/Presentation Layer/Views/{1}/{0}.cshtml");
+        options.ViewLocationFormats.Add("/Presentation Layer/Views/Shared/{0}.cshtml");
+    });
 builder.Services.AddControllers();
 
 // ✅ Configure API Authentication for Swagger
