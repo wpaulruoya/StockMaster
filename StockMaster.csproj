@@ -24,10 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Application Layer\NewFolder\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Update="Presentation Layer\appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
