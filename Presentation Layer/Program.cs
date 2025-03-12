@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.IdentityModel.Tokens;
 using StockMaster.Models;
 using System.Text;
+using StockMaster.ApplicationLayer.Interfaces;
+using StockMaster.ApplicationLayer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -101,11 +103,21 @@ builder.Services.AddControllersWithViews()
     });
 builder.Services.AddControllers();
 
+
+// ✅ Register IUserService with its implementation
+builder.Services.AddScoped<IUserService, UserService>();
+
+
+
 // ✅ Configure API Authentication for Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+
 var app = builder.Build();
+
+
 
 // ✅ Middleware Pipeline
 app.UseExceptionHandler("/Home/Error");
