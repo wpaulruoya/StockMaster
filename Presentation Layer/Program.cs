@@ -113,6 +113,7 @@ builder.Services.AddControllers();
 // ✅ Register IUserService with its implementation
 builder.Services.AddScoped<IUserService, UserService>();
 
+builder.Services.AddScoped<IInventoryService, InventoryService>();
 
 
 // ✅ Configure API Authentication for Swagger

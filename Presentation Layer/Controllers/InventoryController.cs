@@ -1,52 +1,35 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using StockMaster.Models;
 using System.Linq;
 using System.Threading.Tasks;
-using System;
 
 namespace StockMaster.Controllers
 {
     [Authorize]
     public class InventoryController : Controller
     {
-        private readonly SmartStockDbContext _context;
+        private readonly IInventoryService _inventoryService;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public InventoryController(SmartStockDbContext context, UserManager<IdentityUser> userManager)
+        public InventoryController(IInventoryService inventoryService, UserManager<IdentityUser> userManager)
         {
-            _context = context;
+            _inventoryService = inventoryService;
             _userManager = userManager;
         }
 
-        // ✅ View all inventory items for the logged-in user
         public async Task<IActionResult> Index()
         {
-            // Prevent browser from caching the page
-            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
-            Response.Headers["Pragma"] = "no-cache";
-            Response.Headers["Expires"] = "0";
-
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Login", "User");
 
-            var userInventory = await _context.Inventories
-                .Where(i => i.UserId == user.Id)
-                .ToListAsync();
-
+            var userInventory = await _inventoryService.GetUserInventoryAsync(user.Id);
             return View(userInventory);
         }
 
-        // ✅ Show Add Inventory Form with pre-filled UserId
         public async Task<IActionResult> Add()
         {
-            // Prevent browser from caching the page
-            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
-            Response.Headers["Pragma"] = "no-cache";
-            Response.Headers["Expires"] = "0";
-
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Login", "User");
 
@@ -54,7 +37,6 @@ namespace StockMaster.Controllers
             return View(model);
         }
 
-        // ✅ Handle adding a new inventory item
         [HttpPost]
         public async Task<IActionResult> Add(Inventory inventory)
         {
@@ -69,33 +51,22 @@ namespace StockMaster.Controllers
                 return View(inventory);
             }
 
-            try
+            if (await _inventoryService.AddInventoryAsync(inventory))
             {
-                _context.Inventories.Add(inventory);
-                await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Inventory item added successfully!";
                 return RedirectToAction("Index");
             }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = $"Failed to add item: {ex.Message}";
-                return View(inventory);
-            }
+
+            TempData["ErrorMessage"] = "Failed to add inventory item.";
+            return View(inventory);
         }
 
-        // ✅ Show Edit Inventory Form
         public async Task<IActionResult> Edit(int id)
         {
-
-            // Prevent browser from caching the page
-            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
-            Response.Headers["Pragma"] = "no-cache";
-            Response.Headers["Expires"] = "0";
-
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Login", "User");
 
-            var inventory = await _context.Inventories.FirstOrDefaultAsync(i => i.Id == id && i.UserId == user.Id);
+            var inventory = await _inventoryService.GetInventoryByIdAsync(id, user.Id);
             if (inventory == null)
             {
                 TempData["ErrorMessage"] = "Inventory item not found.";
@@ -105,7 +76,6 @@ namespace StockMaster.Controllers
             return View(inventory);
         }
 
-        // ✅ Handle editing an inventory item
         [HttpPost]
         public async Task<IActionResult> Edit(Inventory inventory)
         {
@@ -124,33 +94,22 @@ namespace StockMaster.Controllers
                 return View(inventory);
             }
 
-            try
+            if (await _inventoryService.UpdateInventoryAsync(inventory))
             {
-                _context.Inventories.Update(inventory);
-                await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Inventory item updated successfully!";
                 return RedirectToAction("Index");
             }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = $"Failed to update item: {ex.Message}";
-                return View(inventory);
-            }
+
+            TempData["ErrorMessage"] = "Failed to update inventory item.";
+            return View(inventory);
         }
 
-        // ✅ Show Delete Confirmation Page
         public async Task<IActionResult> Delete(int id)
         {
-
-            // Prevent browser from caching the page
-            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
-            Response.Headers["Pragma"] = "no-cache";
-            Response.Headers["Expires"] = "0";
-
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Login", "User");
 
-            var inventory = await _context.Inventories.FirstOrDefaultAsync(i => i.Id == id && i.UserId == user.Id);
+            var inventory = await _inventoryService.GetInventoryByIdAsync(id, user.Id);
             if (inventory == null)
             {
                 TempData["ErrorMessage"] = "Inventory item not found.";
@@ -160,32 +119,20 @@ namespace StockMaster.Controllers
             return View(inventory);
         }
 
-        // ✅ Handle deletion of an inventory item
         [HttpPost]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Login", "User");
 
-            var inventory = await _context.Inventories.FirstOrDefaultAsync(i => i.Id == id && i.UserId == user.Id);
-            if (inventory == null)
+            if (await _inventoryService.DeleteInventoryAsync(id, user.Id))
             {
-                TempData["ErrorMessage"] = "Inventory item not found.";
-                return RedirectToAction("Index");
-            }
-
-            try
-            {
-                _context.Inventories.Remove(inventory);
-                await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Inventory item deleted successfully!";
                 return RedirectToAction("Index");
             }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = $"Failed to delete item: {ex.Message}";
-                return RedirectToAction("Index");
-            }
+
+            TempData["ErrorMessage"] = "Failed to delete inventory item.";
+            return RedirectToAction("Index");
         }
     }
 }
