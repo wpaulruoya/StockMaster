@@ -22,18 +22,21 @@ namespace StockMaster.Controllers
         public IActionResult Register() => View();
 
         [HttpPost]
-        public async Task<IActionResult> Register(string fullName, string email, string password, string confirmPassword)
+        public async Task<IActionResult> Register(string username, string email, string password, string confirmPassword)
         {
-            var result = await _userService.RegisterUser(fullName, email, password, confirmPassword);
+            var result = await _userService.RegisterUser(username, email, password, confirmPassword);
+
             if (result.Succeeded)
             {
-                TempData["SuccessMessage"] = "Registration successful!";
-                return RedirectToAction("Login", "User");
+                ViewBag.SuccessMessage = "Registration successful! You can now log in.";
+                return RedirectToAction("Login");
             }
 
-            ViewBag.ErrorMessage = "Registration failed.";
+            ViewBag.ErrorMessage = string.Join(", ", result.Errors.Select(e => e.Description));
             return View();
         }
+
+
 
         [HttpPost]
         public async Task<IActionResult> Authenticate(string email, string password)
