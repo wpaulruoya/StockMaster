@@ -22,6 +22,12 @@ builder.Services.AddDbContext<SmartStockDbContext>(options =>
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<SmartStockDbContext>()
     .AddDefaultTokenProviders();
+// ✅ Configure Identity options to allow spaces in usernames
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -._@+";
+    options.User.RequireUniqueEmail = true;
+});
 
 // ✅ Read JWT settings
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");

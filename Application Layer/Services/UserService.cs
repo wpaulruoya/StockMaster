@@ -20,19 +20,32 @@ namespace StockMaster.ApplicationLayer.Services
             _roleManager = roleManager;
         }
 
-        public async Task<IdentityResult> RegisterUser(string fullName, string email, string password, string confirmPassword)
+        public async Task<IdentityResult> RegisterUser(string userName, string email, string password, string confirmPassword)
         {
-            if (string.IsNullOrWhiteSpace(password) || password != confirmPassword)
-                return IdentityResult.Failed(new IdentityError { Description = "Invalid password input." });
+            if (password != confirmPassword)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "Passwords do not match" });
+            }
 
-            var user = new IdentityUser { UserName = email, Email = email };
+            var user = new IdentityUser
+            {
+                UserName = userName,
+                Email = email
+            };
+
             var result = await _userManager.CreateAsync(user, password);
 
-            if (result.Succeeded)
-                await _userManager.AddToRoleAsync(user, "User"); // Assign default role
+            if (!result.Succeeded)
+            {
+                // Log errors for debugging
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                Console.WriteLine($"Registration failed: {errors}");
+            }
 
             return result;
         }
+
+
 
         public async Task<SignInResult> AuthenticateUser(string email, string password)
         {
