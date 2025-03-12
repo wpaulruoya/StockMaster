@@ -25,6 +25,7 @@
             height: 100vh;
             transition: transform 0.3s ease-in-out;
             padding-top: 20px;
+            left: 0;
         }
 
             .sidebar h2 {
@@ -52,6 +53,20 @@
                         text-decoration: none;
                         display: block;
                     }
+
+        .toggle-btn {
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+            background: #2c3e50;
+            border: none;
+            padding: 10px 15px;
+            position: fixed;
+            top: 15px;
+            left: 260px;
+            transition: left 0.3s;
+            z-index: 1000;
+        }
 
         .content {
             margin-left: 250px;
@@ -91,18 +106,38 @@
             transform: translateX(-250px);
         }
 
-        @@media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-250px);
-            }
-
-            .content {
+            .collapsed + .content {
                 margin-left: 0;
             }
+
+            .collapsed + .toggle-btn {
+                left: 10px;
+            }
+
+        @@media (max-width: 768px) {
+            .sidebar
+
+        {
+            transform: translateX(-250px);
+            position: fixed;
+        }
+
+        .content {
+            margin-left: 0;
+        }
+
+        .toggle-btn {
+            left: 10px;
+        }
+
         }
     </style>
 </head>
 <body>
+    <button class="toggle-btn" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
     <div class="sidebar" id="sidebar">
         <h2>Super Admin</h2>
         <ul>
@@ -117,7 +152,7 @@
         </ul>
     </div>
 
-    <div class="content">
+    <div class="content" id="content">
         <div class="dashboard-header">
             <h1>Super Admin Dashboard</h1>
         </div>
@@ -125,32 +160,35 @@
         <div class="dashboard-container">
             <div class="card">
                 <h3>Total Users</h3>
-                <p>@ViewBag.TotalUsers</p>  <!-- Fetching from Controller -->
+                <p>@ViewBag.TotalUsers</p>
             </div>
             <div class="card">
                 <h3>Total Inventory</h3>
-                <p>@ViewBag.TotalInventory</p>  <!-- Fetching from Controller -->
+                <p>@ViewBag.TotalInventory</p>
             </div>
             <div class="card">
                 <h3>Total Admins</h3>
-                <p>@ViewBag.AdminCount</p>  <!-- Display number of Admins -->
+                <p>@ViewBag.AdminCount</p>
             </div>
             <div class="card">
                 <h3>Total Regular Users</h3>
-                <p>@ViewBag.UserCount</p>  <!-- Total Users - Admins -->
+                <p>@ViewBag.UserCount</p>
             </div>
-
         </div>
-
-        
     </div>
 
     <script>
         function toggleSidebar() {
             let sidebar = document.getElementById("sidebar");
             let content = document.getElementById("content");
+            let toggleBtn = document.querySelector(".toggle-btn");
+
             sidebar.classList.toggle("collapsed");
-            content.style.marginLeft = sidebar.classList.contains("collapsed") ? "0" : "250px";
+            if (sidebar.classList.contains("collapsed")) {
+                toggleBtn.style.left = "10px";
+            } else {
+                toggleBtn.style.left = "260px";
+            }
         }
     </script>
 </body>
