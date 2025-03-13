@@ -10,6 +10,8 @@ using StockMaster.ApplicationLayer.Services;
 using StockMaster.Controllers.API;
 using StockMaster.Application_Layer.Interfaces;
 using StockMaster.Application_Layer.Services;
+using StockMaster.Interfaces;
+using StockMaster.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
