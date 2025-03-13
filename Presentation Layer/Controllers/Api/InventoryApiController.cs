@@ -117,7 +117,7 @@ namespace StockMaster.Controllers.API // ✅ Updated namespace after merge
             }
 
             var inventoryItem = await _context.Inventories.FindAsync(id);
-            if (inventoryItem == null || inventoryItem.UserId != userId)
+            if (inventoryItem == null || inventoryItem.UserId != userId) 
             {
                 return NotFound(new { success = false, message = "Inventory item not found or not owned by user." });
             }
