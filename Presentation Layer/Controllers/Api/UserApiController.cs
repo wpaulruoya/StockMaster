@@ -13,7 +13,7 @@ using System.Text;
 
 using Microsoft.Extensions.Configuration;
 
-namespace SmartStockAPI.Controllers
+namespace StockMaster.Controllers
 {
     [Route("api/user")]
     [ApiController]

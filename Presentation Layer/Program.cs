@@ -7,6 +7,7 @@ using StockMaster.Models;
 using System.Text;
 using StockMaster.ApplicationLayer.Interfaces;
 using StockMaster.ApplicationLayer.Services;
+using StockMaster.Controllers.API;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,7 @@ builder.Services.AddDbContext<SmartStockDbContext>(options =>
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<SmartStockDbContext>()
     .AddDefaultTokenProviders();
+
 // ✅ Configure Identity options to allow spaces in usernames
 builder.Services.Configure<IdentityOptions>(options =>
 {
@@ -43,12 +45,12 @@ if (string.IsNullOrEmpty(jwtKey) || string.IsNullOrEmpty(jwtIssuer) || string.Is
 // ✅ Configure Hybrid Authentication (Cookies for MVC, JWT for API)
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme; // Default for MVC
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 })
 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
 {
-    options.LoginPath = "/Account/Login"; // Redirect to login for web users
-    options.AccessDeniedPath = "/Account/AccessDenied"; // Redirect if unauthorized
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
     options.Cookie.HttpOnly = true;
     options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
 })
@@ -75,7 +77,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     {
         if (context.Request.Path.StartsWithSegments("/api"))
         {
-            context.Response.StatusCode = 401; // Prevents redirect loops in API calls
+            context.Response.StatusCode = 401;
             return Task.CompletedTask;
         }
         context.Response.Redirect(context.RedirectUri);
@@ -83,11 +85,13 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 });
 
-// ✅ Enable CORS for API
+// ✅ Enable CORS for API & Frontend
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
-        policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+        policy => policy.WithOrigins("http://localhost:3000")
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
 });
 
 // ✅ Enable Sessions
@@ -108,23 +112,50 @@ builder.Services.AddControllersWithViews()
         options.ViewLocationFormats.Add("/Presentation Layer/Views/Shared/{0}.cshtml");
     });
 builder.Services.AddControllers();
-
-
-// ✅ Register IUserService with its implementation
+   
+// ✅ Register Services
 builder.Services.AddScoped<IUserService, UserService>();
-
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 
-
-// ✅ Configure API Authentication for Swagger
+// ✅ Configure Swagger with JWT Support
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Enter 'Bearer {token}' in the field below."
+    });
 
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 
-
+// ✅ Build Application
 var app = builder.Build();
 
-
+// ✅ Apply Database Migrations Automatically
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<SmartStockDbContext>();
+    dbContext.Database.Migrate();
+}
 
 // ✅ Middleware Pipeline
 app.UseExceptionHandler("/Home/Error");
@@ -132,83 +163,18 @@ app.UseHsts();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
-// ✅ Enable Sessions
 app.UseSession();
-
-// ✅ Enable Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
-
-// ✅ Enable CORS
 app.UseCors("AllowAll");
-
-// ✅ Prevent Back Navigation After Logout
-app.Use(async (context, next) =>
-{
-    context.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
-    context.Response.Headers["Pragma"] = "no-cache";
-    context.Response.Headers["Expires"] = "-1";
-    await next();
-});
 
 // ✅ Swagger Setup
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// ✅ Seed Super Admin and Roles
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    await CreateRolesAndSuperAdmin(services);
-}
-
-// ✅ Map Controllers
+// ✅ Map Controllers & Routes
 app.MapControllers();
+app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// ✅ Map MVC Routes
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
+// ✅ Run Application
 app.Run();
-
-// ===============================================
-// ✅ Function to Create Roles & Super Admin
-// ===============================================
-async Task CreateRolesAndSuperAdmin(IServiceProvider serviceProvider)
-{
-    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
-
-    string[] roleNames = { "SuperAdmin", "Admin", "User" };
-
-    foreach (var role in roleNames)
-    {
-        if (!await roleManager.RoleExistsAsync(role))
-        {
-            await roleManager.CreateAsync(new IdentityRole(role));
-        }
-    }
-
-    // ✅ Super Admin credentials
-    string adminEmail = "StockMaster@gmail.com";
-    string adminPassword = "Admin@2025";
-
-    var superAdmin = await userManager.FindByEmailAsync(adminEmail);
-    if (superAdmin == null)
-    {
-        var user = new IdentityUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
-        var result = await userManager.CreateAsync(user, adminPassword);
-
-        if (result.Succeeded)
-        {
-            await userManager.AddToRoleAsync(user, "SuperAdmin");
-        }
-    }
-    else
-    {
-        await userManager.RemovePasswordAsync(superAdmin);
-        await userManager.AddPasswordAsync(superAdmin, adminPassword);
-    }
-}
