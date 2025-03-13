@@ -1,7 +1,13 @@
-﻿namespace StockMaster.Application_Layer.Interfaces
+﻿using System.Threading.Tasks;
+using StockMaster.Models;
+
+namespace StockMaster.Application_Layer.Interfaces
 {
     public interface IApiUserService
     {
-        // Define method signatures here
+        Task<object> Register(RegisterModel model);
+        Task<object> Login(LoginModel model);
+        Task<object> GetUserDetails(string email);
+        int GetUserCount();
     }
 }
