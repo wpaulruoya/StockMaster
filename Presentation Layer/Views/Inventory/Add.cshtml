@@ -7,18 +7,8 @@
 <div class="container mt-4">
     <h2 class="text-center">Add Inventory Item</h2>
 
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
-    }
-
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-    }
-
     <div class="card shadow-sm p-4">
-        <form asp-action="Add" method="post" onsubmit="disableSubmitButton()">
+        <form asp-action="Add" method="post" id="addInventoryForm">
             <input type="hidden" asp-for="UserId" />
 
             <div class="mb-3">
@@ -54,9 +44,29 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        function disableSubmitButton() {
-            document.getElementById("submitBtn").disabled = true;
+        function showAlert(type, message) {
+            Swal.fire({
+                icon: type,
+                title: message,
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>
+                    showAlert('success', '@TempData["SuccessMessage"]');
+            </text>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>
+                    showAlert('error', '@TempData["ErrorMessage"]');
+            </text>
         }
     </script>
     <partial name="_ValidationScriptsPartial" />
