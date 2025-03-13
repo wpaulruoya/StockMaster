@@ -8,6 +8,8 @@ using System.Text;
 using StockMaster.ApplicationLayer.Interfaces;
 using StockMaster.ApplicationLayer.Services;
 using StockMaster.Controllers.API;
+using StockMaster.Application_Layer.Interfaces;
+using StockMaster.Application_Layer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -112,10 +114,14 @@ builder.Services.AddControllersWithViews()
         options.ViewLocationFormats.Add("/Presentation Layer/Views/Shared/{0}.cshtml");
     });
 builder.Services.AddControllers();
-   
-// ✅ Register Services
+
+// ✅ Register Services (MVC)
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
+
+// ✅ Register API Services (JWT-based)
+builder.Services.AddScoped<IApiUserService, ApiUserService>();
+builder.Services.AddScoped<IApiInventoryService, ApiInventoryService>();
 
 // ✅ Configure Swagger with JWT Support
 builder.Services.AddEndpointsApiExplorer();

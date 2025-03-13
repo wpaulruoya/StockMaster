@@ -1,6 +1,7 @@
 ﻿namespace StockMaster.Application_Layer.Interfaces
 {
-    public class IApiInventoryService
+    public interface IApiInventoryService
     {
+        // Define method signatures here
     }
 }
