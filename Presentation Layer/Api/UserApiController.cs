@@ -10,9 +10,10 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+
 using Microsoft.Extensions.Configuration;
 
-namespace StockMaster.Controllers.Api
+namespace SmartStockAPI.Controllers
 {
     [Route("api/user")]
     [ApiController]
@@ -38,7 +39,6 @@ namespace StockMaster.Controllers.Api
         {
             if (model == null) return BadRequest(new { Message = "Invalid request." });
             if (string.IsNullOrWhiteSpace(model.Password)) return BadRequest(new { Message = "Password cannot be empty." });
-            if (model.Password != model.ConfirmPassword) return BadRequest(new { Message = "Passwords do not match." });
 
             var user = new IdentityUser { UserName = model.Email, Email = model.Email };
 
@@ -50,7 +50,7 @@ namespace StockMaster.Controllers.Api
                     // ✅ Assign 'User' role by default
                     await _userManager.AddToRoleAsync(user, "User");
 
-                    return Ok(new { Message = $"New user with the email: {model.Email} has been successfully registered." });
+                    return Ok(new { Message = $"User {model.Email} registered successfully." });
                 }
                 return BadRequest(new { Message = "Registration failed.", Errors = result.Errors.Select(e => e.Description) });
             }
@@ -60,58 +60,85 @@ namespace StockMaster.Controllers.Api
             }
         }
 
-
         // ✅ LOGIN USER & RETURN JWT
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            if (model == null) return BadRequest(new { Message = "Invalid request. Missing body." });
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
-            {
-                return Unauthorized(new { Message = "Invalid email or password." });
-            }
+                return Unauthorized(new { message = "Invalid email or password" });
 
-            // ✅ Generate JWT Token
-            var token = await GenerateJwtToken(user);
+            // Get user claims and roles
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            // Generate JWT token
+            var token = GenerateJwtToken(user);
 
             return Ok(new
             {
-                Message = "Login successful.",
-                Token = token,
-                UserDetails = new
-                {
-                    Email = user.Email,
-                    UserName = user.UserName,
-                    UserId = user.Id
-                }
+                token,
+                email = user.Email,
+                userName = user.UserName, // Include user's name
+                roles = userRoles
             });
         }
 
+
         // ✅ FETCH USER DETAILS (Protected)
         [HttpGet("details/{email}")]
-        [Authorize] // ✅ Require authentication
         public async Task<IActionResult> GetUserDetails(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
-            if (user == null) return NotFound(new { Message = "User not found." });
 
-            // ✅ Fetch user roles
-            var roles = await _userManager.GetRolesAsync(user);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            // ✅ Generate JWT Token for the user
+            var authClaims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id),
+        new Claim(ClaimTypes.Email, user.Email),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+    };
+
+            foreach (var userRole in userRoles)
+            {
+                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+            }
+
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]));
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["JwtSettings:Issuer"],
+                audience: _configuration["JwtSettings:Audience"],
+                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["JwtSettings:ExpiryMinutes"])),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+            );
+
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
             return Ok(new
             {
-                Email = user.Email,
-                UserName = user.UserName,
-                Role = roles.FirstOrDefault() ?? "User" // ✅ Default to 'User' if no role is assigned
+                id = user.Id,
+                email = user.Email,
+                userName = user.UserName,
+                roles = userRoles,
+                token = tokenString
             });
         }
 
 
         // ✅ GET TOTAL NUMBER OF USERS (Protected)
         [HttpGet("count")]
-        [Authorize(Roles = "Admin,SuperAdmin")] // ✅ Restrict to Admins
+        //[Authorize(Roles = "Admin,SuperAdmin")] // ✅ Restrict to Admins
         public IActionResult GetUserCount()
         {
             var userCount = _userManager.Users.Count();
@@ -151,7 +178,7 @@ namespace StockMaster.Controllers.Api
 
             var token = new JwtSecurityToken(
                 issuer: jwtIssuer,
-                audience: jwtAudience, // ✅ Fixed audience
+                audience: jwtAudience,
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(expiryMinutes),
                 signingCredentials: credentials
