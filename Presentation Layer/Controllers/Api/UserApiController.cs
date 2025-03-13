@@ -184,6 +184,7 @@ namespace StockMaster.Controllers
                 signingCredentials: credentials
             );
 
+
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
