@@ -45,12 +45,7 @@ namespace StockMaster.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(128)",
                 oldMaxLength: 128);
-            migrationBuilder.AddColumn<decimal>(
-    name: "Price",
-    table: "Inventories",
-    type: "decimal(18,2)",
-    nullable: false,
-    defaultValue: 0m);
+            
 
         }
 

@@ -161,8 +161,39 @@ var app = builder.Build();
 // ✅ Apply Database Migrations Automatically
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<SmartStockDbContext>();
-    dbContext.Database.Migrate();
+    var serviceProvider = scope.ServiceProvider;
+    var dbContext = serviceProvider.GetRequiredService<SmartStockDbContext>();
+    dbContext.Database.Migrate(); // Ensure database is up to date
+
+    // Create roles and SuperAdmin user
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+    // Ensure roles exist
+    string[] roles = new[] { "SuperAdmin", "Admin", "User" };
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+
+    // Ensure SuperAdmin exists
+    string superAdminEmail = "stockmaster@gmail.com";
+    string superAdminPassword = "Admin@2025";
+    var superAdmin = await userManager.FindByEmailAsync(superAdminEmail);
+
+    if (superAdmin == null)
+    {
+        superAdmin = new IdentityUser { UserName = superAdminEmail, Email = superAdminEmail, EmailConfirmed = true };
+        var result = await userManager.CreateAsync(superAdmin, superAdminPassword);
+
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(superAdmin, "SuperAdmin");
+        }
+    }
 }
 
 // ✅ Middleware Pipeline
