@@ -3,7 +3,7 @@ using StockMaster.Application_Layer.Interfaces;
 using StockMaster.Models;
 using System.Threading.Tasks;
 
-namespace StockMaster.Controllers.API
+namespace StockMaster.StockMasterAPI.Controllers
 {
     [Route("api/user")]
     [ApiController]
