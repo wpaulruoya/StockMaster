@@ -179,6 +179,7 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
+
     // Ensure SuperAdmin exists
     string superAdminEmail = "stockmaster@gmail.com";
     string superAdminPassword = "Admin@2025";
