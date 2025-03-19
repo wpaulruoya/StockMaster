@@ -9,9 +9,13 @@
 
   <ItemGroup>
     <Compile Remove="Application Layer\Api\**" />
+    <Compile Remove="Presentation Layer\Controllers\Api\**" />
     <Content Remove="Application Layer\Api\**" />
+    <Content Remove="Presentation Layer\Controllers\Api\**" />
     <EmbeddedResource Remove="Application Layer\Api\**" />
+    <EmbeddedResource Remove="Presentation Layer\Controllers\Api\**" />
     <None Remove="Application Layer\Api\**" />
+    <None Remove="Presentation Layer\Controllers\Api\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,10 +40,6 @@
     <Content Update="Presentation Layer\appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Presentation Layer\Controllers\Api\" />
   </ItemGroup>
 
 </Project>
