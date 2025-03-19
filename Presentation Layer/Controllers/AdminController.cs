@@ -10,6 +10,7 @@ using StockMaster.Models;
 using static StockMaster.Controllers.SuperAdminController;
 using Microsoft.AspNetCore.Authentication;
 
+
 namespace StockMaster.Controllers
 {
     [Authorize(Roles = "Admin")]
