@@ -1,27 +1,34 @@
 version: '3.8'
 
 services:
-  app:
-    build: .
+  api:
+    build:
+      context: .
+      dockerfile: SmartStockAPI/Dockerfile
     ports:
-      - "8080:5000" # Map host port 8080 to container port 5000 (MVC/API)
-      - "8081:5001" # HTTPS port
-    depends_on:
-      - db
+      - "5001:8080"  # Map host port 5001 to container port 8080
     environment:
-      - ConnectionStrings__DefaultConnection=Server=db;Database=SmartStockDB;User Id=sa;Password=YourStrong!Passw0rd;
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - database
 
-  db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sql_server
-    restart: always
+  mvc:
+    build:
+      context: .
+      dockerfile: StockMaster/Dockerfile
+    ports:
+      - "5002:8081"  # Map host port 5002 to container port 8081
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - api
+      - database
+
+  database:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    container_name: sqlserver
+    ports:
+      - "1433:1433"
     environment:
       SA_PASSWORD: "YourStrong!Passw0rd"
       ACCEPT_EULA: "Y"
-    ports:
-      - "1433:1433"
-    volumes:
-      - sql_data:/var/opt/mssql
-
-volumes:
-  sql_data:
