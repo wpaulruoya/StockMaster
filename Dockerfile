@@ -1,20 +1,22 @@
-# Use official .NET SDK image for building the MVC app
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-WORKDIR /app
-EXPOSE 8081
-
-# Use SDK image to build the project
+# Use official .NET SDK image as a build environment
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ["StockMaster/StockMaster.csproj", "StockMaster/"]
-RUN dotnet restore "StockMaster/StockMaster.csproj"
 
-COPY . .
-WORKDIR "/src/StockMaster"
-RUN dotnet publish -c Release -o /app/publish
+# Copy everything and restore as distinct layers
+COPY ["StockMaster.csproj", "./"]
+RUN dotnet restore "StockMaster.csproj"
 
-# Final runtime image
-FROM base AS final
+# Copy the rest of the application source code
+COPY . . 
+WORKDIR "/src"
+
+# Build and publish the application
+RUN dotnet publish "StockMaster.csproj" -c Release -o /app/publish
+
+# Use a runtime image to run the app
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
+
+# Start the application
 ENTRYPOINT ["dotnet", "StockMaster.dll"]

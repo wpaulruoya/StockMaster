@@ -1,34 +1,35 @@
-version: '3.8'
-
 services:
   api:
     build:
-      context: .
-      dockerfile: SmartStockAPI/Dockerfile
+      context: "C:/Users/pruoy/source/repos/wpaulruoya/SmartStockAPI"
+      dockerfile: Dockerfile
     ports:
-      - "5001:8080"  # Map host port 5001 to container port 8080
+      - "5001:5001"
+      - "5000:5000"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=database;Database=smartstock;User Id=sa;Password=Manyatta;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False
     depends_on:
       - database
 
-  mvc:
+  web:
     build:
-      context: .
-      dockerfile: StockMaster/Dockerfile
+      context: "C:/Users/pruoy/source/repos/wpaulruoya/StockMaster"
+      dockerfile: Dockerfile
     ports:
-      - "5002:8081"  # Map host port 5002 to container port 8081
+      - "8080:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=database;Database=smartstock;User Id=sa;Password=Manyatta;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False
     depends_on:
       - api
       - database
 
   database:
-    image: "mcr.microsoft.com/mssql/server:2022-latest"
-    container_name: sqlserver
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    container_name: stockmaster_db
     ports:
-      - "1433:1433"
+      - "1436:1433"
     environment:
-      SA_PASSWORD: "YourStrong!Passw0rd"
+      SA_PASSWORD: "Manyatta"
       ACCEPT_EULA: "Y"
