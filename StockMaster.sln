@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35707.178 d17.12
+VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockMaster", "StockMaster.csproj", "{59102C31-915C-4D08-8805-3BCDE7E2202C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartStockAPI", "..\SmartStockAPI\SmartStockAPI.csproj", "{83522342-8344-885F-0A3A-A7ED4F986B93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +17,15 @@ Global
 		{59102C31-915C-4D08-8805-3BCDE7E2202C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59102C31-915C-4D08-8805-3BCDE7E2202C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59102C31-915C-4D08-8805-3BCDE7E2202C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83522342-8344-885F-0A3A-A7ED4F986B93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83522342-8344-885F-0A3A-A7ED4F986B93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83522342-8344-885F-0A3A-A7ED4F986B93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83522342-8344-885F-0A3A-A7ED4F986B93}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D76F560F-4ADD-4B4A-84E9-304A55528587}
 	EndGlobalSection
 EndGlobal
