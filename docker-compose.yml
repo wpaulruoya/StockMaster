@@ -1,4 +1,4 @@
-services:
+﻿services:
   api:
     build:
       context: "C:/Users/pruoy/source/repos/wpaulruoya/SmartStockAPI"
@@ -8,7 +8,8 @@ services:
       - "7122:7122"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=database,8089;Database=smartstock;User Id=sa;Password=Manyatta;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False
+      - ConnectionStrings__DefaultConnection=Server=database,8089;Database=smartstock;User Id=sa;Password=Manyatta2025!;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False
+      - ASPNETCORE_URLS=http://+:5168   # 👈 Add this
     depends_on:
       - database
 
@@ -21,7 +22,8 @@ services:
       - "7082:7082"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=database,8089;Database=smartstock;User Id=sa;Password=Manyatta;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False
+      - ConnectionStrings__DefaultConnection=Server=database,8089;Database=smartstock;User Id=sa;Password=Manyatta2025!;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False
+      - ASPNETCORE_URLS=http://+:5120   # 👈 Add this
     depends_on:
       - api
       - database
@@ -32,5 +34,5 @@ services:
     ports:
       - "8089:1433"
     environment:
-      SA_PASSWORD: "Manyatta"
+      SA_PASSWORD: "Manyatta2025!"
       ACCEPT_EULA: "Y"
