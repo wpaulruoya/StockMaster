@@ -19,4 +19,4 @@ WORKDIR /app
 COPY --from=build /app/publish .
 
 # Start the application
-ENTRYPOINT ["dotnet", "StockMaster.dll"]
+ENTRYPOINT ["dotnet", "StockMaster.dll", "--urls", "http://+:5120"]
