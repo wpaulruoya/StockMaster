@@ -4,11 +4,11 @@ services:
       context: "C:/Users/pruoy/source/repos/wpaulruoya/SmartStockAPI"
       dockerfile: Dockerfile
     ports:
-      - "5001:5001"
-      - "5000:5000"
+      - "5168:5168"
+      - "7122:7122"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=database;Database=smartstock;User Id=sa;Password=Manyatta;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False
+      - ConnectionStrings__DefaultConnection=Server=database,8089;Database=smartstock;User Id=sa;Password=Manyatta;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False
     depends_on:
       - database
 
@@ -17,10 +17,11 @@ services:
       context: "C:/Users/pruoy/source/repos/wpaulruoya/StockMaster"
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "5120:5120"
+      - "7082:7082"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=database;Database=smartstock;User Id=sa;Password=Manyatta;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False
+      - ConnectionStrings__DefaultConnection=Server=database,8089;Database=smartstock;User Id=sa;Password=Manyatta;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False
     depends_on:
       - api
       - database
@@ -29,7 +30,7 @@ services:
     image: "mcr.microsoft.com/mssql/server:2019-latest"
     container_name: stockmaster_db
     ports:
-      - "1436:1433"
+      - "8089:1433"
     environment:
       SA_PASSWORD: "Manyatta"
       ACCEPT_EULA: "Y"
