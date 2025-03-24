@@ -69,6 +69,7 @@ app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
+
 // ✅ Map Controllers & Routes
 app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 
