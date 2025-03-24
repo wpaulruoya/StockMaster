@@ -8,8 +8,8 @@
       - "7122:7122"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=database,8089;Database=smartstock;User Id=sa;Password=Manyatta2025!;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False
-      - ASPNETCORE_URLS=http://+:5168   # 👈 Add this
+      - ConnectionStrings__DefaultConnection=Server=stockmaster_db,1433;Database=smartstock;User Id=sa;Password=Manyatta2025!;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False
+      - ASPNETCORE_URLS=http://+:5168
     depends_on:
       - database
 
@@ -22,11 +22,10 @@
       - "7082:7082"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=database,8089;Database=smartstock;User Id=sa;Password=Manyatta2025!;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False
-      - ASPNETCORE_URLS=http://+:5120   # 👈 Add this
+      - ConnectionStrings__DefaultConnection=Server=stockmaster_db,1433;Database=smartstock;User Id=sa;Password=Manyatta2025!;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False
+      - ASPNETCORE_URLS=http://+:5120
     depends_on:
-      - api
-      - database
+      - database  # 👈 Removed dependency on API
 
   database:
     image: "mcr.microsoft.com/mssql/server:2019-latest"
