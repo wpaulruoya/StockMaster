@@ -61,7 +61,7 @@ builder.Services.AddScoped<IInventoryService, InventoryService>();
 var app = builder.Build();
 
 // ✅ Middleware Pipeline (Fix Order)
-app.UseHttpsRedirection(); // 🔄 Redirect HTTP → HTTPS
+//app.UseHttpsRedirection(); // 🔄 Redirect HTTP → HTTPS
 app.UseHsts();             // 🔐 Enforce HTTPS
 app.UseStaticFiles();
 app.UseRouting();
