@@ -1,37 +1,37 @@
 ﻿services:
-  api:
-    build:
-      context: "C:/Users/pruoy/source/repos/wpaulruoya/SmartStockAPI"
-      dockerfile: Dockerfile
-    ports:
-      - "5168:5168"
-      - "7122:7122"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=smartstock,1433;Database=smartstock;User Id=sa;Password=Manyatta2025!;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False
-      - ASPNETCORE_URLS=http://+:5168
-    depends_on:
-      - smartstock
-
-  web:
-    build:
-      context: "C:/Users/pruoy/source/repos/wpaulruoya/StockMaster"
-      dockerfile: Dockerfile
-    ports:
-      - "5120:5120"
-      - "7085:7085"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=smartstock,1433;Database=smartstock;User Id=sa;Password=Manyatta2025!;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False
-      - ASPNETCORE_URLS=http://+:5120
-    depends_on:
-      - smartstock
-
-  smartstock:
-    image: "mcr.microsoft.com/mssql/server:2019-latest"
+  smartstock-db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
     container_name: smartstock
-    ports:
-      - "8089:1433"
+    restart: always
     environment:
       SA_PASSWORD: "Manyatta2025!"
       ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - smartstock_data:/var/opt/mssql
+
+  stockmaster-web:
+    build:
+      context: C:/Users/pruoy/source/repos/wpaulruoya/StockMaster  # Corrected to reference StockMaster explicitly
+      dockerfile: Dockerfile
+    container_name: stockmaster-web
+    ports:
+      - "5120:5120"
+      - "7085:7085"
+    depends_on:
+      - smartstock-db
+
+  stockmaster-api:
+    build:
+      context: C:/Users/pruoy/source/repos/wpaulruoya/SmartStockAPI  # Corrected to reference SmartStockAPI explicitly
+      dockerfile: Dockerfile
+    container_name: stockmaster-api
+    ports:
+      - "5168:5168"
+      - "7122:7122"
+    depends_on:
+      - smartstock-db
+
+volumes:
+  smartstock_data:
