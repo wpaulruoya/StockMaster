@@ -73,18 +73,27 @@ else
     app.Urls.Add("https://*:7085");
 }
 
+// ✅ Apply Migrations Automatically (Insert Here)
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<SmartStockDbContext>();
+    dbContext.Database.Migrate(); // ✅ Apply migrations & create DB if missing
+}
+
 // ✅ Middleware Pipeline (Fix Order)
-//app.UseHttpsRedirection(); // 🔄 Redirect HTTP → HTTPS
-app.UseHsts();             // 🔐 Enforce HTTPS
+app.UseHsts();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
-
 // ✅ Map Controllers & Routes
 app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 
 // ✅ Run Application
 app.Run();
+
+
+
+
