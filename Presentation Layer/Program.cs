@@ -58,7 +58,20 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 
 // ✅ Build Application
+
+
 var app = builder.Build();
+
+// ✅ Use HTTP only in Docker
+if (app.Environment.IsDevelopment() || Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true")
+{
+    app.Urls.Add("http://*:5120"); // ✅ Ensure HTTP works inside Docker
+}
+else
+{
+    app.Urls.Add("http://*:5120");
+    app.Urls.Add("https://*:7085");
+}
 
 // ✅ Middleware Pipeline (Fix Order)
 //app.UseHttpsRedirection(); // 🔄 Redirect HTTP → HTTPS
