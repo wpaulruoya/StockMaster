@@ -1,0 +1,24 @@
+﻿services:
+  stockmaster:
+    image: stockmaster-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5120:5120"  # Map HTTP port
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db,1433;Database=smartstock;User Id=sa;Password=Manyatta2025!;TrustServerCertificate=True
+      - ASPNETCORE_URLS=http://+:5120  # ✅ Disable HTTPS inside Docker
+    depends_on:
+      - db
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver-db
+    ports:
+      - "1435:1433"
+    environment:
+      SA_PASSWORD: "Manyatta2025!"
+      ACCEPT_EULA: "Y"
+    restart: always 
