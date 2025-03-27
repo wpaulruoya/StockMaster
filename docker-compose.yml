@@ -5,21 +5,22 @@
       context: .
       dockerfile: Dockerfile
     ports:
-      - "5120:5120"  # Map HTTP port
+      - "5120:5120"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=db,1433;Database=smartstock;User Id=sa;Password=Manyatta2025!;TrustServerCertificate=True
-      - ASPNETCORE_URLS=http://+:5120  # ✅ Disable HTTPS inside Docker
-    depends_on:
-      - db
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal\\SQLEXPRESS;Database=smartstock;User Id=sa;Password=Manyatta2025!;TrustServerCertificate=True
+      - ASPNETCORE_URLS=http://+:5120
+    depends_on: []
 
-  db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sqlserver_container
+  smartstockapi:
+    image: smartstock-api
+    build:
+      context: ../SmartStockAPI
+      dockerfile: Dockerfile
     ports:
-      - "1433:1433"
+      - "5168:5168"
     environment:
-      SA_PASSWORD: "Manyatta2025!"
-      ACCEPT_EULA: "Y"
-    restart: always 
-    
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal\\SQLEXPRESS;Database=smartstock;User Id=sa;Password=Manyatta2025!;TrustServerCertificate=True
+      - ASPNETCORE_URLS=http://+:5168
+    depends_on: []
