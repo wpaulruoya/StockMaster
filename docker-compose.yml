@@ -1,26 +1,41 @@
 ﻿services:
-  stockmaster:
-    image: stockmaster-app
+  stockmaster-web:  # ✅ New container name
+    image: stockmaster-webimage:latest  # ✅ New image name
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "5120:5120"
+    depends_on:
+      - smartstock-db
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=host.docker.internal\\SQLEXPRESS;Database=smartstock;User Id=sa;Password=Manyatta2025!;TrustServerCertificate=True
-      - ASPNETCORE_URLS=http://+:5120
-    depends_on: []
+      - ConnectionStrings__DefaultConnection=Server=smartstock-db,1433;Database=smartstock;User Id=sa;Password=Manyatta2025!;TrustServerCertificate=True
 
-  smartstockapi:
-    image: smartstock-api
+  smartstock-api:  # ✅ New API container name
+    image: smartstock-api-image:latest  # ✅ New API image name
     build:
       context: ../SmartStockAPI
       dockerfile: Dockerfile
     ports:
       - "5168:5168"
+      - "7122:7122"
+    depends_on:
+      - smartstock-db
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=host.docker.internal\\SQLEXPRESS;Database=smartstock;User Id=sa;Password=Manyatta2025!;TrustServerCertificate=True
-      - ASPNETCORE_URLS=http://+:5168
-    depends_on: []
+      - ConnectionStrings__DefaultConnection=Server=smartstock-db,1433;Database=smartstock;User Id=sa;Password=Manyatta2025!;TrustServerCertificate=True
+
+  smartstock-db:  
+    image: mcr.microsoft.com/mssql/server:latest  # ✅ Use official SQL Server image
+    container_name: smartstock-db
+    environment:
+      SA_PASSWORD: "Manyatta2025!"  # ✅ Set strong SA password
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql  # ✅ Persist DB data
+
+volumes:
+  sqlserver-data:  # ✅ Named volume for database persistence
+
