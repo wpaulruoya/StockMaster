@@ -73,12 +73,20 @@ else
     app.Urls.Add("https://*:7085");
 }
 
-// ✅ Apply Migrations Automatically (Insert Here)
+// ✅ Apply Migrations & Seed Super Admin
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<SmartStockDbContext>();
-    dbContext.Database.Migrate(); // ✅ Apply migrations & create DB if missing
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<SmartStockDbContext>();
+    var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+    var dbInitializer = new DbInitializer(dbContext, userManager, roleManager);
+    await dbInitializer.InitializeAsync();
 }
+
+
+
 
 // ✅ Middleware Pipeline (Fix Order)
 app.UseHsts();
