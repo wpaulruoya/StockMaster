@@ -87,7 +87,6 @@ using (var scope = app.Services.CreateScope())
 
 
 
-
 // ✅ Middleware Pipeline (Fix Order)
 app.UseHsts();
 app.UseStaticFiles();
