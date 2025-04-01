@@ -1,6 +1,6 @@
 ﻿services:
-  stockmaster-web:  # ✅ New container name
-    image: stockmaster-webimage:latest  # ✅ New image name
+  stockmaster-web:
+    image: stockmaster-webimage:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -8,11 +8,12 @@
       - "5120:5120"
     depends_on:
       - smartstock-db
+    restart: always
     environment:
       - ConnectionStrings__DefaultConnection=Server=smartstock-db,1433;Database=smartstock;User Id=sa;Password=Manyatta2025!;TrustServerCertificate=True
 
-  smartstock-api:  # ✅ New API container name
-    image: smartstock-api-image:latest  # ✅ New API image name
+  smartstock-api:
+    image: smartstock-api-image:latest
     build:
       context: ../SmartStockAPI
       dockerfile: Dockerfile
@@ -21,21 +22,27 @@
       - "7122:7122"
     depends_on:
       - smartstock-db
+    restart: always
     environment:
       - ConnectionStrings__DefaultConnection=Server=smartstock-db,1433;Database=smartstock;User Id=sa;Password=Manyatta2025!;TrustServerCertificate=True
 
-  smartstock-db:  
-    image: mcr.microsoft.com/mssql/server:latest  # ✅ Use official SQL Server image
+  smartstock-db:
+    image: mcr.microsoft.com/mssql/server:latest
     container_name: smartstock-db
+    restart: always
     environment:
-      SA_PASSWORD: "Manyatta2025!"  # ✅ Set strong SA password
+      SA_PASSWORD: "Manyatta2025!"
       ACCEPT_EULA: "Y"
       MSSQL_PID: "Developer"
     ports:
       - "1433:1433"
     volumes:
-      - sqlserver-data:/var/opt/mssql  # ✅ Persist DB data
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "Manyatta2025!", "-Q", "SELECT 1"]
+      interval: 10s
+      retries: 5
 
 volumes:
-  sqlserver-data:  # ✅ Named volume for database persistence
-
+  sqlserver-data:
+    driver: local
