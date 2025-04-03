@@ -19,13 +19,17 @@
       dockerfile: Dockerfile
     ports:
       - "5168:5168"
-      - "7122:7122"
     depends_on:
       - smartstock-db
     restart: always
+    # volumes:
+    #   - ./https-dev-cert.pfx:/https/dev-cert.pfx
     environment:
+      - ASPNETCORE_URLS=http://+:5168  # Force HTTP only
       - ConnectionStrings__DefaultConnection=Server=smartstock-db,1433;Database=smartstock;User Id=sa;Password=Manyatta2025!;TrustServerCertificate=True
-
+      # - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/dev-cert.pfx
+      # - ASPNETCORE_Kestrel__Certificates__Default__Password=Manyatta2025!
+  
   smartstock-db:
     image: mcr.microsoft.com/mssql/server:latest
     container_name: smartstock-db
