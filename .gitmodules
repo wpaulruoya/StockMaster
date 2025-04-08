@@ -1,0 +1,3 @@
+[submodule "SmartStockAPI"]
+	path = SmartStockAPI
+	url = https://github.com/wpaulruoya/SmartStockAPI.git
