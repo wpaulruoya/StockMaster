@@ -1,27 +1,52 @@
-version: '3.8'
-
-services:
-  app:
-    build: .
+﻿services:
+  stockmaster-web:
+    image: stockmaster-webimage:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "8080:5000" # Map host port 8080 to container port 5000 (MVC/API)
-      - "8081:5001" # HTTPS port
+      - "5120:5120"
     depends_on:
-      - db
-    environment:
-      - ConnectionStrings__DefaultConnection=Server=db;Database=SmartStockDB;User Id=sa;Password=YourStrong!Passw0rd;
-
-  db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sql_server
+      - smartstock-db
     restart: always
     environment:
-      SA_PASSWORD: "YourStrong!Passw0rd"
+      - ConnectionStrings__DefaultConnection=Server=smartstock-db,1433;Database=smartstock;User Id=sa;Password=Manyatta2025!;TrustServerCertificate=True
+
+  smartstock-api:
+    image: smartstock-api-image:latest
+    build:
+      context: ../SmartStockAPI
+      dockerfile: Dockerfile
+    ports:
+      - "5168:5168"
+    depends_on:
+      - smartstock-db
+    restart: always
+    # volumes:
+    #   - ./https-dev-cert.pfx:/https/dev-cert.pfx
+    environment:
+      - ASPNETCORE_URLS=http://+:5168  # Force HTTP only
+      - ConnectionStrings__DefaultConnection=Server=smartstock-db,1433;Database=smartstock;User Id=sa;Password=Manyatta2025!;TrustServerCertificate=True
+      # - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/dev-cert.pfx
+      # - ASPNETCORE_Kestrel__Certificates__Default__Password=Manyatta2025!
+  
+  smartstock-db:
+    image: mcr.microsoft.com/mssql/server:latest
+    container_name: smartstock-db
+    restart: always
+    environment:
+      SA_PASSWORD: "Manyatta2025!"
       ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
     ports:
       - "1433:1433"
     volumes:
-      - sql_data:/var/opt/mssql
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "Manyatta2025!", "-Q", "SELECT 1"]
+      interval: 10s
+      retries: 5
 
 volumes:
-  sql_data:
+  sqlserver-data:
+    driver: local

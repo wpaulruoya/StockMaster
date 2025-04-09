@@ -1,121 +1,87 @@
-﻿@{
-    ViewData["Title"] = "Dashboard";
-}
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StockMaster Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
 
-<div class="home-container">
-    <!-- Hero Section -->
-    <section class="home-hero">
-        <h1>Welcome to StockMaster</h1>
-        <p>Manage your inventory efficiently and effortlessly.</p>
-        <a class="btn btn-primary btn-lg" href="@Url.Action("Index", "Inventory")">Manage Inventory</a>
-    </section>
+  <!-- Navbar -->
+  <nav class="bg-blue-900 text-white px-4 py-3 shadow-md">
+    <div class="container mx-auto flex items-center justify-between flex-wrap">
+      <!-- Logo -->
+      <div class="flex items-center flex-shrink-0 text-white mr-6">
+        <span class="font-bold text-2xl tracking-tight">StockMaster</span>
+      </div>
 
-    <!-- Features Section -->
-    <section class="home-features">
-        <div class="feature-box">
-            <h3>📦 Easy Inventory Management</h3>
-            <p>Track and update your stock in real-time with a seamless interface.</p>
+      <!-- Hamburger menu -->
+      <div class="block lg:hidden">
+        <button id="nav-toggle" class="flex items-center px-3 py-2 border rounded text-white border-white hover:text-blue-300">
+          <svg class="fill-current h-4 w-4" viewBox="0 0 20 20">
+            <title>Menu</title>
+            <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Navbar links -->
+      <div id="nav-content" class="w-full block flex-grow lg:flex lg:items-center lg:w-auto hidden lg:block">
+        <div class="text-sm lg:flex-grow">
+          <a href="#" class="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-blue-300 mr-4">Home</a>
+          <a href="#" class="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-blue-300 mr-4">Inventory</a>
+          <a href="#" class="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-blue-300">Reports</a>
         </div>
-        <div class="feature-box">
-            <h3>🔒 Secure & Reliable</h3>
-            <p>Industry-standard security ensures your data is protected.</p>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="text-center mt-10 px-6">
+    <div class="max-w-4xl mx-auto bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg p-10 shadow-lg">
+      <h1 class="text-4xl font-bold mb-4">Welcome to StockMaster</h1>
+      <p class="text-lg mb-6">Manage your inventory efficiently and effortlessly.</p>
+      <a href="#" class="bg-white text-blue-600 font-semibold py-2 px-6 rounded hover:bg-blue-100 transition">Manage Inventory</a>
+    </div>
+  </section>
+
+  <!-- Feature Cards -->
+  <section class="mt-12 px-6">
+    <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="flex items-center mb-4">
+          <span class="text-2xl">📦</span>
+          <h3 class="text-xl font-semibold ml-2 text-blue-700">Easy Inventory Management</h3>
         </div>
-        <div class="feature-box">
-            <h3>📊 Analytics & Reports</h3>
-            <p>Gain insights with advanced reporting tools and analytics.</p>
+        <p class="text-gray-700">Track and update your stock in real-time with a seamless interface.</p>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="flex items-center mb-4">
+          <span class="text-2xl">🔒</span>
+          <h3 class="text-xl font-semibold ml-2 text-green-700">Secure & Reliable</h3>
         </div>
-    </section>
-</div>
+        <p class="text-gray-700">Industry-standard security ensures your data is protected.</p>
+      </div>
 
-<style>
-    /* Home Page Styling */
-    .home-container {
-        max-width: 1000px;
-        margin: auto;
-        padding: 40px 20px;
-        background: #fff;
-        border-radius: 10px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        text-align: center;
-    }
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="flex items-center mb-4">
+          <span class="text-2xl">📊</span>
+          <h3 class="text-xl font-semibold ml-2 text-purple-700">Analytics & Reports</h3>
+        </div>
+        <p class="text-gray-700">Gain insights with advanced reporting tools and analytics.</p>
+      </div>
+    </div>
+  </section>
 
-    /* Hero Section */
-    .home-hero {
-        background: linear-gradient(135deg, #1e3c72, #2a5298);
-        color: white;
-        padding: 50px 20px;
-        border-radius: 10px 10px 0 0;
-    }
+  <!-- JavaScript for menu toggle -->
+  <script>
+    document.getElementById("nav-toggle").addEventListener("click", function () {
+      const navContent = document.getElementById("nav-content");
+      navContent.classList.toggle("hidden");
+    });
+  </script>
 
-        .home-hero h1 {
-            font-size: 36px;
-            margin-bottom: 10px;
-        }
-
-        .home-hero p {
-            font-size: 18px;
-            max-width: 600px;
-            margin: 0 auto 20px;
-        }
-
-        .home-hero .btn {
-            font-size: 18px;
-            padding: 12px 25px;
-        }
-
-    /* Features Section */
-    .home-features {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        padding: 30px 20px;
-    }
-
-    .feature-box {
-        background: rgba(240, 240, 240, 0.9);
-        padding: 20px;
-        border-radius: 8px;
-        flex: 1;
-        min-width: 250px;
-        margin: 10px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease-in-out;
-    }
-
-        .feature-box:hover {
-            transform: translateY(-5px);
-        }
-
-        .feature-box h3 {
-            font-size: 20px;
-            color: #e67e22;
-        }
-
-        .feature-box p {
-            font-size: 16px;
-            color: #333;
-        }
-
-    /* Responsive Design */
-    @@media screen and (max-width: 768px) {
-        .home-container {
-            width: 95%;
-        }
-
-        .home-hero h1 {
-            font-size: 28px;
-        }
-
-        .home-hero p {
-            font-size: 16px;
-        }
-
-        .feature-box h3 {
-            font-size: 18px;
-        }
-
-        .feature-box p {
-            font-size: 14px;
-        }
-    }
-</style>
+</body>
+</html>

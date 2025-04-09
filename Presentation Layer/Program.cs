@@ -58,11 +58,37 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 
 // ✅ Build Application
+
+
 var app = builder.Build();
 
+// ✅ Use HTTP only in Docker
+if (app.Environment.IsDevelopment() || Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true")
+{
+    app.Urls.Add("http://*:5120"); // ✅ Ensure HTTP works inside Docker
+}
+else
+{
+    app.Urls.Add("http://*:5120");
+    app.Urls.Add("https://*:7085");
+}
+
+// ✅ Apply Migrations & Seed Super Admin
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<SmartStockDbContext>();
+    var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+    var dbInitializer = new DbInitializer(dbContext, userManager, roleManager);
+    await dbInitializer.InitializeAsync();
+}
+
+
+
 // ✅ Middleware Pipeline (Fix Order)
-app.UseHttpsRedirection(); // 🔄 Redirect HTTP → HTTPS
-app.UseHsts();             // 🔐 Enforce HTTPS
+app.UseHsts();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();
@@ -74,3 +100,7 @@ app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Inde
 
 // ✅ Run Application
 app.Run();
+
+
+
+
