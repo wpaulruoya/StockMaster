@@ -1,46 +1,156 @@
 ﻿@{
-    ViewData["Title"] = "Dashboard";
+    Layout = null;
+    var isLoggedIn = Context.Session.GetString("UserEmail") != null;
 }
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Home - StockMaster</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/StockMaster.styles.css" />
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="d-flex flex-column min-vh-100">
+    <header>
+        <nav class="navbar navbar-expand-lg custom-navbar">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">StockMaster</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Home">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Inventory" asp-action="Index">Inventory</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="About">About</a>
+                        </li>
+                    </ul>
 
-    <!-- 🔹 Container -->
-    <div class="max-w-5xl mx-auto p-6 bg-white shadow-xl rounded-lg mt-10">
+                    @if (isLoggedIn)
+                    {
+                        <form method="post" asp-controller="User" asp-action="Logout" class="d-flex">
+                            <button type="submit" class="btn btn-danger">Logout</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </nav>
+    </header>
 
-        <!-- 🔹 Hero Section -->
-        <section class="bg-gradient-to-r from-blue-700 to-indigo-600 text-white p-10 rounded-t-lg text-center">
-            <h1 class="text-4xl font-bold mb-3">Welcome to StockMaster</h1>
-            <p class="text-lg max-w-xl mx-auto mb-6">Manage your inventory efficiently and effortlessly.</p>
-            <a href="@Url.Action("Index", "Inventory")"
-               class="inline-block bg-white text-blue-700 font-semibold px-6 py-3 rounded-lg shadow hover:bg-gray-100 transition duration-200">
-                Manage Inventory
-            </a>
-        </section>
-
-        <!-- 🔹 Features Section -->
-        <section class="grid gap-6 md:grid-cols-3 mt-10 p-4">
-            <div class="bg-gray-50 rounded-lg p-6 shadow hover:shadow-lg transition transform hover:-translate-y-1">
-                <h3 class="text-xl font-semibold text-blue-600 mb-2">📦 Easy Inventory Management</h3>
-                <p class="text-gray-700 text-sm">Track and update your stock in real-time with a seamless interface.</p>
-            </div>
-            <div class="bg-gray-50 rounded-lg p-6 shadow hover:shadow-lg transition transform hover:-translate-y-1">
-                <h3 class="text-xl font-semibold text-green-600 mb-2">🔒 Secure & Reliable</h3>
-                <p class="text-gray-700 text-sm">Industry-standard security ensures your data is protected.</p>
-            </div>
-            <div class="bg-gray-50 rounded-lg p-6 shadow hover:shadow-lg transition transform hover:-translate-y-1">
-                <h3 class="text-xl font-semibold text-purple-600 mb-2">📊 Analytics & Reports</h3>
-                <p class="text-gray-700 text-sm">Gain insights with advanced reporting tools and analytics.</p>
-            </div>
-        </section>
+    <div class="container flex-grow-1">
+        <main role="main" class="pb-3">
+            <h1>Welcome to StockMaster</h1>
+            <p>This is your home page.</p>
+        </main>
     </div>
 
+    <footer class="custom-footer mt-auto">
+        <div class="container text-center">
+            <p class="footer-text">&copy; 2025 - StockMaster | <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a></p>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js"></script>
 </body>
 </html>
+
+<style>
+    .custom-navbar {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        padding: 15px;
+        border-bottom: 3px solid #e67e22;
+    }
+
+        .custom-navbar .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+            color: white !important;
+        }
+
+        .custom-navbar .nav-link {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8) !important;
+            transition: all 0.3s ease-in-out;
+        }
+
+            .custom-navbar .nav-link:hover {
+                color: #e67e22 !important;
+                transform: scale(1.05);
+            }
+
+            .custom-navbar .nav-link.active {
+                color: white !important;
+                font-weight: bold;
+            }
+
+        .custom-navbar .btn-danger {
+            font-size: 16px;
+            padding: 8px 15px;
+        }
+
+    .custom-footer {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        padding: 20px;
+        color: white;
+        text-align: center;
+        font-size: 16px;
+        position: relative;
+    }
+
+        .custom-footer .footer-text {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .custom-footer a {
+            color: #f39c12;
+            text-decoration: none;
+            transition: color 0.3s ease-in-out;
+        }
+
+            .custom-footer a:hover {
+                color: #e67e22;
+                text-decoration: underline;
+            }
+
+    @@media screen and (max-width: 768px) {
+        .custom-navbar
+
+    {
+        padding: 10px;
+    }
+
+    .custom-navbar .navbar-brand {
+        font-size: 20px;
+    }
+
+    .custom-navbar .nav-link {
+        font-size: 16px;
+    }
+
+    .custom-navbar .btn-danger {
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+
+    .custom-footer {
+        padding: 15px;
+        font-size: 14px;
+    }
+
+    }
+</style>
